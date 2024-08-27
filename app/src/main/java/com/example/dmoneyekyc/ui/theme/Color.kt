@@ -1,11 +1,13 @@
 package com.example.dmoneyekyc.ui.theme
 
 import androidx.compose.ui.graphics.Color
+val Orange80 = Color(0xFFF68E2A);
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+val Orange40 = Color(0xFFF68E2A)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val grey = Color(0xFFEEEEEE)
+
+val border = Color(0xFFE7E5E5)
+val focusedBorder = Color(0xFFB9B7B7)
+val disableColor = Color(0xFFA2A2A2)
+val backgroundColor = Color(0x8CF5F5F5)
