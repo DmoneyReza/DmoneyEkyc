@@ -73,22 +73,22 @@ fun Home (
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center) {
 
-        Button(onClick = {
-//            navigate to Gallery
-            if (context.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != android.content.pm.PackageManager.PERMISSION_GRANTED &&
-                context.checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) != android.content.pm.PackageManager.PERMISSION_GRANTED
-            ){
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                galleryPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-            } else {
-                galleryPermissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
-            }
-            }else{
-
-            }
-        }) {
-          Text(text = "Gallery")
-        }
+//        Button(onClick = {
+////            navigate to Gallery
+//            if (context.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != android.content.pm.PackageManager.PERMISSION_GRANTED &&
+//                context.checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) != android.content.pm.PackageManager.PERMISSION_GRANTED
+//            ){
+//            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+//                galleryPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+//            } else {
+//                galleryPermissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
+//            }
+//            }else{
+//
+//            }
+//        }) {
+//          Text(text = "Gallery")
+//        }
 
         Spacer(modifier = Modifier.height(20.dp))
 

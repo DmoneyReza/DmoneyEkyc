@@ -9,6 +9,11 @@ sealed class AuthRoute (
         title = "Home"
     )
 
+    data object Final: AuthRoute(
+        route = "Final",
+        title = "Final"
+    )
+
     data object Login: AuthRoute(
         route = "Login",
         title = "Login"

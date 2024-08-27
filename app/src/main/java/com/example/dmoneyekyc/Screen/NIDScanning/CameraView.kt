@@ -272,7 +272,7 @@ fun CameraView(
                         }else if(label.value.contains("Back")){
                             viewModel.NIDBack.value = capturedImage.value
                             navController.navigate(AuthRoute.FaceAnalyzer.route){
-                                popUpTo(AuthRoute.SignUp.route){
+                                popUpTo(AuthRoute.Home.route){
                                     inclusive = false
                                 }
                             }

@@ -178,7 +178,11 @@ fun FaceScanningScreen(
         if(direction.value =="done") {
             delay(2000) // 2 seconds delay
 
-            navController.popBackStack()
+            navController.navigate(AuthRoute.Final.route){
+                popUpTo(AuthRoute.Home.route){
+                    inclusive = false
+                }
+            }
 
         }
 

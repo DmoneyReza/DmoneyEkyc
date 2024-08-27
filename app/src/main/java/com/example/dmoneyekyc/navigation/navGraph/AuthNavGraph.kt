@@ -10,6 +10,7 @@ import androidx.navigation.compose.navigation
 import com.example.dmoney.feature.SelfieVerification.FaceScanningScreen
 import com.example.dmoney.navigation.route.AuthRoute
 import com.example.dmoney.navigation.route.GraphRoute
+import com.example.dmoneyekyc.Screen.Final
 import com.example.dmoneyekyc.Screen.Home
 import com.example.imagetotextextractor.utlis.working.CaptureNIDScreen
 
@@ -75,6 +76,23 @@ fun NavGraphBuilder.AuthNavGraph(
             },
         ) {
             FaceScanningScreen(navController = navController)
+        }
+        composable(
+            route = AuthRoute.Final.route,
+            enterTransition = { ->
+                slideInHorizontally(initialOffsetX = { 1000 }, animationSpec = tween(300))
+            },
+            exitTransition = { ->
+                slideOutHorizontally(targetOffsetX = { -1000 }, animationSpec = tween(300))
+            },
+            popExitTransition = { ->
+                slideOutHorizontally(targetOffsetX = { 1000 }, animationSpec = tween(300))
+            },
+            popEnterTransition = { ->
+                slideInHorizontally(initialOffsetX = { -1000 }, animationSpec = tween(300))
+            },
+        ) {
+            Final(navController = navController)
         }
     }
 
