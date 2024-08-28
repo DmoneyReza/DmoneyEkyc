@@ -133,6 +133,8 @@ fun FaceScanningScreen(
         headMovement.value = when {
             face.headEulerAngleY > headMovementThreshold -> "Right"
             face.headEulerAngleY < -headMovementThreshold -> "Left"
+            face.headEulerAngleX > headMovementThreshold -> "Up"
+            face.headEulerAngleX < -headMovementThreshold -> "Down"
             face.headEulerAngleY < 1.0f && face.headEulerAngleY > -1.0f -> "Front"
 
             else -> "None"
@@ -187,6 +189,28 @@ fun FaceScanningScreen(
         }
 
     }
+
+    var sweepAngles = remember {
+        mutableStateOf(72f)
+    }
+
+//    if (HeadMoveMentList.contains("Front")){
+//        sweepAngles.value += 72f
+//        direction.value = "Left"
+//    }else if(HeadMoveMentList.contains("Left")){
+//        sweepAngles.value += 72f
+//        direction.value = "Right"
+//    }else if(HeadMoveMentList.contains("Right")){
+//        sweepAngles.value += 72f
+//        direction.value = "Up"
+//    }else if(HeadMoveMentList.contains("Up")){
+//        sweepAngles.value += 72f
+//        direction.value = "Right"
+//    }else if(HeadMoveMentList.contains("Down")){
+//        sweepAngles.value += 72f
+//        direction.value = "Right"
+//    }
+
 
 
 
@@ -256,8 +280,8 @@ fun FaceScanningScreen(
                 if (HeadMoveMentList.contains("Front")) {
                     drawArc(
                         color = progressColor,
-                        startAngle = 240f,
-                        sweepAngle = 120f,
+                        startAngle = 270f,
+                        sweepAngle = 72f,
                         useCenter = false,
                         style = Stroke(width = 9f),
                         topLeft = androidx.compose.ui.geometry.Offset(
@@ -273,8 +297,8 @@ fun FaceScanningScreen(
 
                     drawArc(
                         color = progressColor,
-                        startAngle = 0f,
-                        sweepAngle = 120f,
+                        startAngle =342f,
+                        sweepAngle = 72f,
                         useCenter = false,
                         style = Stroke(width = 9f),
                         topLeft = androidx.compose.ui.geometry.Offset(
@@ -292,8 +316,41 @@ fun FaceScanningScreen(
             if (HeadMoveMentList.contains("Right")) {
                 drawArc(
                     color = progressColor,
-                    startAngle = 120f,
-                    sweepAngle = 120f,
+                    startAngle = 54f,
+                    sweepAngle = 72f,
+                    useCenter = false,
+                    style = Stroke(width = 9f),
+                    topLeft = androidx.compose.ui.geometry.Offset(
+                        canvasWidth / 2 - radius,
+                        canvasHeight / 2 - radius
+                    ),
+                    size = androidx.compose.ui.geometry.Size(radius * 2, radius * 2)
+                )
+                direction.value = "Up"
+            }
+
+            if (HeadMoveMentList.contains("Up")) {
+                drawArc(
+                    color = progressColor,
+                    startAngle = 126f,
+                    sweepAngle = 72f,
+                    useCenter = false,
+                    style = Stroke(width = 9f),
+                    topLeft = androidx.compose.ui.geometry.Offset(
+                        canvasWidth / 2 - radius,
+                        canvasHeight / 2 - radius
+                    ),
+                    size = androidx.compose.ui.geometry.Size(radius * 2, radius * 2)
+                )
+                direction.value = "Down"
+            }
+
+
+            if (HeadMoveMentList.contains("Down")) {
+                drawArc(
+                    color = progressColor,
+                    startAngle = 198f,
+                    sweepAngle = 72f,
                     useCenter = false,
                     style = Stroke(width = 9f),
                     topLeft = androidx.compose.ui.geometry.Offset(
