@@ -197,16 +197,20 @@ fun FaceScanningScreen(
 //    if (HeadMoveMentList.contains("Front")){
 //        sweepAngles.value += 72f
 //        direction.value = "Left"
-//    }else if(HeadMoveMentList.contains("Left")){
+//    }
+//    if(HeadMoveMentList.contains("Left")){
 //        sweepAngles.value += 72f
 //        direction.value = "Right"
-//    }else if(HeadMoveMentList.contains("Right")){
+//    }
+//    if(HeadMoveMentList.contains("Right")){
 //        sweepAngles.value += 72f
 //        direction.value = "Up"
-//    }else if(HeadMoveMentList.contains("Up")){
+//    }
+//    if(HeadMoveMentList.contains("Up")){
 //        sweepAngles.value += 72f
 //        direction.value = "Right"
-//    }else if(HeadMoveMentList.contains("Down")){
+//    }
+//    if(HeadMoveMentList.contains("Down")){
 //        sweepAngles.value += 72f
 //        direction.value = "Right"
 //    }
@@ -443,6 +447,48 @@ fun FaceScanningScreen(
 
                     Text(
                         text = "Look to the left",
+
+                        textAlign = TextAlign.Center,
+                        style = TextStyle(
+                            fontFamily = FontFamily(Font(R.font.inter)),
+                            fontWeight = FontWeight(700),
+                            fontSize = 18.sp
+                        ),
+                        color = Color.White
+                    )
+                }else if(direction.value == "Up"){
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_face_front),
+                        contentDescription = "Start Icon",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(64.dp)
+                    )
+
+
+                    Text(
+                        text = "Look to the Up",
+
+                        textAlign = TextAlign.Center,
+                        style = TextStyle(
+                            fontFamily = FontFamily(Font(R.font.inter)),
+                            fontWeight = FontWeight(700),
+                            fontSize = 18.sp
+                        ),
+                        color = Color.White
+                    )
+                }else if(direction.value == "Down"){
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_face_front),
+                        contentDescription = "Start Icon",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(64.dp)
+                    )
+
+
+                    Text(
+                        text = "Look to the Down",
 
                         textAlign = TextAlign.Center,
                         style = TextStyle(

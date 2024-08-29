@@ -26,7 +26,7 @@ class FaceAnalyzer(
 ) : ImageAnalysis.Analyzer {
 
     companion object {
-        const val THROTTLE_TIMEOUT_MS = 700L
+        const val THROTTLE_TIMEOUT_MS = 1_000L
     }
 
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
