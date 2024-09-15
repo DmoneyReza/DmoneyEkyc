@@ -5,3 +5,9 @@ class Model(
     val token_type:String,
     val expires_in:Int,
 )
+
+
+data class NidMainModel(
+    val nid:String="",
+    val dob:String=""
+)

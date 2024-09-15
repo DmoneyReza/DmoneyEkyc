@@ -81,13 +81,14 @@ fun CameraView(
     viewModel: ServiceViewModel = hiltViewModel(),
     navController: NavController,
     onImageCaptured: (Uri) -> Unit,
-    onImageAccept:(ImageBitmap)->Unit,
+    onImageAccept:(Uri)->Unit,
     onOCR:(String)->Unit) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
     val imageCapture = remember { mutableStateOf<ImageCapture?>(null) }
+    val imageUri = remember { mutableStateOf<Uri?>(null) }
     var capturedImage = remember { mutableStateOf<ImageBitmap?>(null) }
 
     var label = remember {
@@ -98,7 +99,7 @@ fun CameraView(
     }
 
 
-    val outputDirectory = getOutputDirectory(context)
+
     val configuration = LocalConfiguration.current
 
     val screenHeight = configuration.screenHeightDp
@@ -267,11 +268,14 @@ fun CameraView(
 
                 CircleWithIcon(
                     onClick = {
+                        imageUri.value?.let { onImageAccept(it) }
                         if(label.value.contains("Font")){
                             viewModel.NIDFront.value = capturedImage.value
+
+//                            viewModel.uploadNidFront(imageUri.value.toString())
                         }else if(label.value.contains("Back")){
                             viewModel.NIDBack.value = capturedImage.value
-                            navController.navigate(AuthRoute.FaceAnalyzer.route){
+                            navController.navigate(AuthRoute.Final.route){
                                 popUpTo(AuthRoute.Home.route){
                                     inclusive = false
                                 }
@@ -293,17 +297,6 @@ fun CameraView(
                         .padding(bottom = 16.dp)
                 ) {
 
-                    Log.d("hangleClicke", "CameraView: ")
-                    // Handle capture button click here
-                    // Example: Start camera capture logic
-                    val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
-
-//            val photoFile = File(
-//                outputDirectory,
-//                SimpleDateFormat(FILENAME_FORMAT, Locale.US)
-//                    .format(System.currentTimeMillis()) + ".jpg"
-//            )
-
                     val photoFile = File(
                         context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
                         "photo_${System.currentTimeMillis()}.jpg"
@@ -322,6 +315,7 @@ fun CameraView(
                             override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                                 val savedUri = Uri.fromFile(photoFile)
                                 onImageCaptured(savedUri)
+                                imageUri.value = savedUri
                                 // Handle the saved image URI
 
                                 val imageBitmap = loadImageBitmapFromUri(context, savedUri)
@@ -333,6 +327,7 @@ fun CameraView(
 
 
                                 capturedImage.value = rotatedBitmap.asImageBitmap()
+
 
 
                             }

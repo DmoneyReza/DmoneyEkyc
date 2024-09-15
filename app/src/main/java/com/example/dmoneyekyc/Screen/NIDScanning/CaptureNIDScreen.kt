@@ -37,40 +37,17 @@ fun CaptureNIDScreen(
     Column(  modifier= Modifier.navigationBarsPadding()) {
         CameraView(onImageCaptured = { uri ->
             // Handle the captured image URI
+            Log.d("showMyLog", "CaptureNIDScreen: " + uri.toString())
+
         },
-            onImageAccept = {imageBitmap ->
-                viewModel.NIDFront.value = imageBitmap
+            onImageAccept = {uri ->
+//                viewModel.NIDFront.value = imageBitmap
+                viewModel.uploadNidFront(uri.toString())
             },
             onOCR = {},
             navController = navController
         )
 
-        Button(onClick = {
-            val FILENAME_FORMAT = ""
-            val photoFile = File(
-                outputDirectory,
-                SimpleDateFormat(FILENAME_FORMAT, Locale.US)
-                    .format(System.currentTimeMillis()) + ".jpg"
-            )
-
-            val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
-            imageCapture.value?.takePicture(
-                outputOptions,
-                ContextCompat.getMainExecutor(context),
-                object : ImageCapture.OnImageSavedCallback {
-                    override fun onError(exc: ImageCaptureException) {
-                        Log.e("CaptureImage", "Photo capture failed: ${exc.message}", exc)
-                    }
-
-                    override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                        val savedUri = Uri.fromFile(photoFile)
-                        // Handle the saved image URI
-                    }
-                }
-            )
-        }) {
-            Text("Capture Image")
-        }
     }
 }
 

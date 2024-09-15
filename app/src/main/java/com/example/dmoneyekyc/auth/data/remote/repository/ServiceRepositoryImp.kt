@@ -5,9 +5,11 @@ import com.example.dmoney.auth.data.remote.authApiService
 import com.example.dmoney.auth.data.remote.dto.ModelDto
 import com.example.dmoney.auth.domain.model.Model
 import com.example.dmoney.auth.domain.repository.ServiceRepository
+import com.example.dmoneyekyc.auth.data.remote.dto.NidFrontModelDto
 import com.example.dmoneyekyc.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import okhttp3.MultipartBody
 import okio.IOException
 import java.util.Date
 import javax.inject.Inject
@@ -49,6 +51,38 @@ class ServiceRepositoryImp @Inject constructor(
                 data = dummyTokenModel.toModel()
             ))
         }
+
+    }
+
+    val deummyNidData = NidFrontModelDto(
+        nid = "0001262192356",
+        dob = "15/11/1992"
+    )
+
+    override suspend fun getNidInfo(requestBody: MultipartBody): Flow<Resource<NidFrontModelDto>> = flow{
+        emit(Resource.Loading())
+
+        try {
+         val data =    api.getNidInfo()
+          emit(Resource.Success(data = data))
+        }catch (ex:retrofit2.HttpException){
+            val errorMessage = when (ex.code()) {
+                404 -> "NID information not found"
+                500 -> "Server error"
+                else ->"HTTP error: ${ex.code()}"
+            }
+            emit(Resource.Error(
+                message = errorMessage,
+                data = deummyNidData
+            ))
+
+        }catch (ex:IOException){
+            emit(Resource.Error(
+                message = ex.toString(),
+                data = deummyNidData
+            ))
+        }
+
 
     }
 }
