@@ -3,6 +3,7 @@ package com.example.imagetotextextractor.utlis.working
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,7 @@ fun CaptureNIDScreen(
     viewModel: ServiceViewModel = hiltViewModel(),
     navController: NavController
 ) {
+    val sharedViewModel: ServiceViewModel = hiltViewModel(LocalContext.current as ComponentActivity)
     val context = LocalContext.current
     val imageCapture = remember { mutableStateOf<ImageCapture?>(null) }
     val outputDirectory = getOutputDirectory(context)
@@ -42,7 +44,7 @@ fun CaptureNIDScreen(
         },
             onImageAccept = {uri ->
 //                viewModel.NIDFront.value = imageBitmap
-                viewModel.uploadNidFront(uri.toString())
+                sharedViewModel.uploadNidFront(uri.toString())
             },
             onOCR = {},
             navController = navController

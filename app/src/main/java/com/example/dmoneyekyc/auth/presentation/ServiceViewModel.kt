@@ -57,6 +57,9 @@ class ServiceViewModel @Inject constructor(
     val BirthCertificate = mutableStateOf<ImageBitmap?>(null)
 
 
+    val eyeOpenFaceImageUri = mutableStateOf<Uri?>(null);
+
+
     private val _nidFronTRemoteState = mutableStateOf(NidMainModel())
     val nidFrontRemoteState = _nidFronTRemoteState
 

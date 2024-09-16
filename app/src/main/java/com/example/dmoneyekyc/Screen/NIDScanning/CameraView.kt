@@ -147,12 +147,6 @@ fun CameraView(
             previewView
         })
 
-//        DarkOverlayWithArchTransRoundedCorners(
-//            rectangleWidth = getScreenSizeDp(LocalContext.current) - 25.dp,
-//            rectangleHeight = getResizableHeight(0.3, LocalContext.current),
-//            borderThickness = 4.dp,
-//            cornerRadius = 5.dp
-//        )
 
         DrawCenteredFrame(
             width = getScreenSizeDp(LocalContext.current) - 25.dp,
@@ -275,7 +269,7 @@ fun CameraView(
 //                            viewModel.uploadNidFront(imageUri.value.toString())
                         }else if(label.value.contains("Back")){
                             viewModel.NIDBack.value = capturedImage.value
-                            navController.navigate(AuthRoute.Final.route){
+                            navController.navigate(AuthRoute.FaceAnalyzer.route){
                                 popUpTo(AuthRoute.Home.route){
                                     inclusive = false
                                 }

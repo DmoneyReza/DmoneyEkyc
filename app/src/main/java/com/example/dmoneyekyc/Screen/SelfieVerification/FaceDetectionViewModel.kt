@@ -16,4 +16,9 @@ class FaceDetectionViewModel @Inject constructor(
     private val connectivityObserver: ConnectivityObserver
 ): ViewModel()  {
     val localStorage = localStorage
+
+
+    fun uploadFace(){
+
+    }
 }

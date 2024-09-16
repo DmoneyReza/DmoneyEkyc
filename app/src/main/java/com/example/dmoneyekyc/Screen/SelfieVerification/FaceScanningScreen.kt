@@ -2,13 +2,16 @@ package com.example.dmoney.feature.SelfieVerification
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
+import android.media.Image
 import android.util.Log
 
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.activity.ComponentActivity
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
 import androidx.camera.view.CameraController
@@ -21,42 +24,29 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -73,15 +63,16 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.LifecycleOwner
-import androidx.navigation.NavController import com.example.dmoney.navigation.route.AuthRoute
-import com.example.dmoney.navigation.route.GraphRoute
+import androidx.navigation.NavController
+import com.example.dmoney.auth.presentation.ServiceViewModel
+import com.example.dmoney.navigation.route.AuthRoute
 import com.example.dmoneyekyc.R
+import com.example.dmoneyekyc.Screen.SelfieVerification.utli.mediaImageToBitmap
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
 import kotlinx.coroutines.delay
-import kotlin.math.sqrt
-
-
+import saveBitmapToFile
+import saveInputImageAsJpeg
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -89,7 +80,9 @@ import kotlin.math.sqrt
 @Composable
 fun FaceScanningScreen(
     viewModel: FaceDetectionViewModel = hiltViewModel(),
-    navController: NavController) {
+    navController: NavController
+) {
+    val sharedViewModel: ServiceViewModel = hiltViewModel(LocalContext.current as ComponentActivity)
 
     val context: Context = LocalContext.current
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
@@ -104,7 +97,7 @@ fun FaceScanningScreen(
     val screenHeight = configuration.screenHeightDp
 
     val headMovement = remember { mutableStateOf("No face detected") }
-    val selectedImage = remember { mutableStateOf<InputImage?>(null) }
+    val selectedImage = remember { mutableStateOf<Image?>(null) }
     val headMovementThreshold = 10.0f // Threshold for head movement detection
 
     val HeadMoveMentList = remember {
@@ -117,7 +110,7 @@ fun FaceScanningScreen(
     }
     if (headMovement.value != null) {
         if (!HeadMoveMentList.contains(headMovement.value)) {
-            if(direction.value == headMovement.value){
+            if (direction.value == headMovement.value) {
 
                 HeadMoveMentList.add(headMovement.value)
             }
@@ -126,7 +119,7 @@ fun FaceScanningScreen(
 
 
 
-    fun onTextUpdated(face: Face,image:InputImage) {
+    fun onTextUpdated(face: Face, image: Image) {
 
 
         Log.d("headEulerAngleY", "onTextUpdated: " + face.headEulerAngleY)
@@ -140,12 +133,17 @@ fun FaceScanningScreen(
             else -> "None"
         }
 
-        if(face.leftEyeOpenProbability!! > 0.5f && face.leftEyeOpenProbability!! > 0.5f){
+        if (face.leftEyeOpenProbability!! > 0.5f && face.leftEyeOpenProbability!! > 0.5f) {
 
-            Log.d("leftEyeOpenProbability", "FaceScanningScreen: "+ "Eye Open" )
-            if(selectedImage.value ==null){
+            Log.d("leftEyeOpenProbability", "FaceScanningScreen: " + "Eye Open")
+            if (selectedImage.value == null) {
 
                 selectedImage.value = image
+                var bitmap = mediaImageToBitmap(image)
+                var uri = saveBitmapToFile(context, bitmap!!)
+                sharedViewModel.eyeOpenFaceImageUri.value = uri
+                Log.i("mediaImageToBitmap", "uri: " + uri)
+                Log.d("leftEyeOpenProbability", "FaceScanningScreen: " + "${selectedImage.value}")
             }
         }
 //        if(face.leftEyeOpenProbability!! < 0.1f && face.leftEyeOpenProbability!! < 0.1f){
@@ -155,9 +153,6 @@ fun FaceScanningScreen(
 
 
 
-
-
-        Log.d("leftEyeOpenProbability", "FaceScanningScreen: "+ "${ selectedImage.value}" )
 
 
     }
@@ -175,9 +170,13 @@ fun FaceScanningScreen(
         )
     )
 
-    LaunchedEffect(direction.value =="done") {
+    fun inputImageToBitmap(inputImage: InputImage): Bitmap? {
+        return inputImage.bitmapInternal  // Extract Bitmap if InputImage was created from a Bitmap or MediaImage
+    }
 
-        if(direction.value =="done") {
+    LaunchedEffect(direction.value == "done") {
+
+        if (direction.value == "done") {
             delay(2000) // 2 seconds delay
 
             navController.navigate(AuthRoute.Final.route){
@@ -189,6 +188,7 @@ fun FaceScanningScreen(
         }
 
     }
+
 
     var sweepAngles = remember {
         mutableStateOf(72f)
@@ -214,8 +214,6 @@ fun FaceScanningScreen(
 //        sweepAngles.value += 72f
 //        direction.value = "Right"
 //    }
-
-
 
 
     Box(
@@ -245,7 +243,7 @@ fun FaceScanningScreen(
                         previewView = previewView,
                         onDetectedTextUpdated = ::onTextUpdated,
 
-                    )
+                        )
                 }
             }
         )
@@ -281,39 +279,38 @@ fun FaceScanningScreen(
 
 
 
-                if (HeadMoveMentList.contains("Front")) {
-                    drawArc(
-                        color = progressColor,
-                        startAngle = 270f,
-                        sweepAngle = 72f,
-                        useCenter = false,
-                        style = Stroke(width = 9f),
-                        topLeft = androidx.compose.ui.geometry.Offset(
-                            canvasWidth / 2 - radius,
-                            canvasHeight / 2 - radius
-                        ),
-                        size = androidx.compose.ui.geometry.Size(radius * 2, radius * 2)
-                    )
-                    direction.value = "Left"
-                }
+            if (HeadMoveMentList.contains("Front")) {
+                drawArc(
+                    color = progressColor,
+                    startAngle = 270f,
+                    sweepAngle = 72f,
+                    useCenter = false,
+                    style = Stroke(width = 9f),
+                    topLeft = androidx.compose.ui.geometry.Offset(
+                        canvasWidth / 2 - radius,
+                        canvasHeight / 2 - radius
+                    ),
+                    size = androidx.compose.ui.geometry.Size(radius * 2, radius * 2)
+                )
+                direction.value = "Left"
+            }
 
-                if (HeadMoveMentList.contains("Left")) {
+            if (HeadMoveMentList.contains("Left")) {
 
-                    drawArc(
-                        color = progressColor,
-                        startAngle =342f,
-                        sweepAngle = 72f,
-                        useCenter = false,
-                        style = Stroke(width = 9f),
-                        topLeft = androidx.compose.ui.geometry.Offset(
-                            canvasWidth / 2 - radius,
-                            canvasHeight / 2 - radius
-                        ),
-                        size = androidx.compose.ui.geometry.Size(radius * 2, radius * 2)
-                    )
-                    direction.value ="Right"
-                }
-
+                drawArc(
+                    color = progressColor,
+                    startAngle = 342f,
+                    sweepAngle = 72f,
+                    useCenter = false,
+                    style = Stroke(width = 9f),
+                    topLeft = androidx.compose.ui.geometry.Offset(
+                        canvasWidth / 2 - radius,
+                        canvasHeight / 2 - radius
+                    ),
+                    size = androidx.compose.ui.geometry.Size(radius * 2, radius * 2)
+                )
+                direction.value = "Right"
+            }
 
 
             //up
@@ -367,29 +364,32 @@ fun FaceScanningScreen(
             }
 
 
-
         }
         Text(
             text = "Selfie Capture",
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.TopCenter)
-                .padding(top = 80.dp)
-            , textAlign = TextAlign.Center,
+                .padding(top = 80.dp), textAlign = TextAlign.Center,
             style = MaterialTheme.typography.titleMedium,
             color = Color.White
         )
 
-        Box(modifier = Modifier
+        Box(
+            modifier = Modifier
 
-            .fillMaxWidth()
-            .align(Alignment.BottomCenter)
-            .padding(bottom = (screenHeight * 0.15).dp, start = 40.dp, end = 40.dp)){
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .padding(bottom = (screenHeight * 0.15).dp, start = 40.dp, end = 40.dp)
+        ) {
 
-            Column(modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(5.dp)){
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(5.dp)
+            ) {
 
-                if(direction.value == "Front"){
+                if (direction.value == "Front") {
 
                     Icon(
                         painter = painterResource(id = R.drawable.ic_face_front),
@@ -412,7 +412,7 @@ fun FaceScanningScreen(
                     )
 
 
-                }else if(direction.value == "Left"){
+                } else if (direction.value == "Left") {
 
                     Icon(
                         painter = painterResource(id = R.drawable.ic_face_right),
@@ -435,7 +435,7 @@ fun FaceScanningScreen(
                     )
 
 
-                }else if(direction.value == "Right"){
+                } else if (direction.value == "Right") {
 
                     Icon(
                         painter = painterResource(id = R.drawable.ic_face_left),
@@ -456,7 +456,7 @@ fun FaceScanningScreen(
                         ),
                         color = Color.White
                     )
-                }else if(direction.value == "Up"){
+                } else if (direction.value == "Up") {
 
                     Icon(
                         painter = painterResource(id = R.drawable.ic_face_front),
@@ -477,7 +477,7 @@ fun FaceScanningScreen(
                         ),
                         color = Color.White
                     )
-                }else if(direction.value == "Down"){
+                } else if (direction.value == "Down") {
 
                     Icon(
                         painter = painterResource(id = R.drawable.ic_face_front),
@@ -502,23 +502,22 @@ fun FaceScanningScreen(
 
                 }
 
-                if(direction.value !="done"){
-                Text(
-                    text = "Move your head to slowly to complete the box",
+                if (direction.value != "done") {
+                    Text(
+                        text = "Move your head to slowly to complete the box",
 
-                    textAlign = TextAlign.Center,
-                    style = TextStyle(
-                        fontFamily = FontFamily(Font(R.font.inter)),
-                        fontWeight = FontWeight(500),
-                        fontSize = 14.sp
-                    ),
-                    color = Color.White
-                )
-                    }
+                        textAlign = TextAlign.Center,
+                        style = TextStyle(
+                            fontFamily = FontFamily(Font(R.font.inter)),
+                            fontWeight = FontWeight(500),
+                            fontSize = 14.sp
+                        ),
+                        color = Color.White
+                    )
+                }
 
             }
         }
-
 
 
     }
@@ -530,17 +529,18 @@ private fun startTextRecognition(
     cameraController: LifecycleCameraController,
     lifecycleOwner: LifecycleOwner,
     previewView: PreviewView,
-    onDetectedTextUpdated: (Face,InputImage) -> Unit,
+    onDetectedTextUpdated: (Face, Image) -> Unit,
 
-) {
+    ) {
 
     cameraController.imageAnalysisTargetSize = CameraController.OutputSize(AspectRatio.RATIO_16_9)
     cameraController.setImageAnalysisAnalyzer(
         ContextCompat.getMainExecutor(context),
         FaceAnalyzer(onDetectedTextUpdated = {},
-            onDetectFace = {face,image->
-                onDetectedTextUpdated(face,image)
-            })
+            onDetectFace = { face, image ->
+                onDetectedTextUpdated(face, image)
+            },
+            context)
     )
 
     cameraController.bindToLifecycle(lifecycleOwner)

@@ -2,11 +2,13 @@ package com.example.dmoney.navigation.navGraph
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.example.dmoney.auth.presentation.ServiceViewModel
 import com.example.dmoney.feature.SelfieVerification.FaceScanningScreen
 import com.example.dmoney.navigation.route.AuthRoute
 import com.example.dmoney.navigation.route.GraphRoute
@@ -20,7 +22,7 @@ fun NavGraphBuilder.AuthNavGraph(
 ) {
 
     navigation(
-        startDestination = AuthRoute.Home.route,
+        startDestination = AuthRoute.NIDScanning.route,
         route = GraphRoute.AuthGraph
     ) {
         composable(
@@ -56,6 +58,7 @@ fun NavGraphBuilder.AuthNavGraph(
                 slideInHorizontally(initialOffsetX = { -1000 }, animationSpec = tween(300))
             },
         ) {
+
             CaptureNIDScreen(navController = navController)
         }
 
