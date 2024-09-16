@@ -50,7 +50,7 @@ android {
 //            buildConfigField 'String', 'BASE_URL', '"https://test.dmoney.com.bd:3035/DmoneyPlatform/"'
 
             buildConfigField("String","BASE_URL",
-                "\"https://test.dmoney.com.bd:3035/DmoneyPlatform/\""
+                "\"http://192.168.1.236:8080/\""
             )
 
         }
