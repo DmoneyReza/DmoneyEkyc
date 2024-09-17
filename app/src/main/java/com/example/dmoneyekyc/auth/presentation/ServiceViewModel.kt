@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import androidx.lifecycle.SavedStateHandle
@@ -24,6 +25,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import javax.inject.Inject
@@ -38,6 +40,7 @@ class ServiceViewModel @Inject constructor(
 //    here keeping the state of our concurrent api calls for authentication methodology.
 
     val localStorage = localStorage
+
 
     private val _accessTokenState = mutableStateOf(authState())
     val accessToken = _accessTokenState
@@ -58,19 +61,19 @@ class ServiceViewModel @Inject constructor(
 
 
     val eyeOpenFaceImageUri = mutableStateOf<Uri?>(null);
+    val nidFrontImage = mutableStateOf<Uri?>(null);
+
+
 
 
     private val _nidFronTRemoteState = mutableStateOf(NidMainModel())
     val nidFrontRemoteState = _nidFronTRemoteState
 
-    fun uploadNidFront(filePath:String){
-        val file = File(filePath);
-
-        val fileRequestBody = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
+    fun uploadNidFront(requestBody: RequestBody){
 
         val requestBody = MultipartBody.Builder()
             .setType(MultipartBody.FORM)
-            .addFormDataPart("file", file.name, fileRequestBody)  // Use the file's name
+            .addFormDataPart("file", "output_image.jpg", requestBody)  // Use the file's name
             .addFormDataPart("pageMode", "11")
             .addFormDataPart("ocrEngineMode", "1")
             .addFormDataPart("lang", "eng")
@@ -90,9 +93,7 @@ class ServiceViewModel @Inject constructor(
                         )
                         localStorage.putString("nid",resource.data?.nid!!)
                         localStorage.putString("dob",resource.data?.dob!!)
-                        android.util.Log.d("requestBOdy", "uploadNidFront: "+resource.message )
-                        android.util.Log.d("requestBOdy", "uploadNidFront: "+resource.data?.nid!! )
-                        android.util.Log.d("requestBOdy", "uploadNidFront: "+resource.data?.dob!! )
+
                     }
                     is Resource.Loading -> {
 
@@ -108,15 +109,13 @@ class ServiceViewModel @Inject constructor(
             }.launchIn(this)
         }
 
-        Log.d("requestBOdy", "uploadNidFront: "+requestBody)
-        Log.d("MultipartRequest", "File name: ${file.name}")
-        Log.d("MultipartRequest", "File path: $filePath")
+
     }
 
 
     init{
         observeNetworkStatus()
-        getAccessToken()
+//        getAccessToken()
         localStorage.putString("Key","Hello World")//just for test
     }
 

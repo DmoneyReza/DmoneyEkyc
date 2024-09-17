@@ -30,6 +30,7 @@ fun Final(
     val sharedViewModel: ServiceViewModel = hiltViewModel(LocalContext.current as ComponentActivity)
 
     val painter = rememberAsyncImagePainter(sharedViewModel.eyeOpenFaceImageUri.value)
+    val painterNid = rememberAsyncImagePainter(sharedViewModel.nidFrontImage.value)
 
     Column(Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -48,6 +49,17 @@ fun Final(
                 .rotate(270f)
                 .padding(16.dp) // Adjust padding as needed
         )
+
+        androidx.compose.foundation.Image(
+            painter = painterNid,
+            contentDescription = null,
+            modifier = Modifier
+                .size(200.dp)
+                .rotate(270f)
+                .padding(16.dp) // Adjust padding as needed
+        )
+
+
 
         Text(text = "Rnid: ${sharedViewModel.nidFrontRemoteState.value.nid}")
         Text(text = "Rdob: ${sharedViewModel.nidFrontRemoteState.value.dob}")

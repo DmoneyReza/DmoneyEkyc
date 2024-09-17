@@ -4,7 +4,7 @@
         <domain includeSubdomains="true">localhost</domain>
     </domain-config>
     <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">192.168.1.236</domain>
+        <domain includeSubdomains="true">dsandbox.dmoney.com.bd</domain>
         <!-- You can add other domains as needed -->
     </domain-config>
     <!-- To allow cleartext traffic for all domains (less secure), use: -->

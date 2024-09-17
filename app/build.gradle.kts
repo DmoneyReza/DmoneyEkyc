@@ -37,7 +37,7 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
         debug{
-            applicationIdSuffix = ".db"
+//            applicationIdSuffix = ".db"
 //            buildConfigField 'String', 'PRODUCT_CODE', '"DM"'
             buildConfigField("String","PRODUCT_CODE", "\"DM\"")
 //            buildConfigField 'String', 'SERVICE_CONTROLLER', '"E8xlkWsSjZKBZ8yQ6VjaQIUM9tUfo/bPdrOy+BATiwc="'
@@ -50,8 +50,11 @@ android {
 //            buildConfigField 'String', 'BASE_URL', '"https://test.dmoney.com.bd:3035/DmoneyPlatform/"'
 
             buildConfigField("String","BASE_URL",
-                "\"http://192.168.1.236:8080/\""
+                "\"http://dsandbox.dmoney.com.bd:4040/\""
             )
+//            buildConfigField("String","BASE_URL",
+//                "\"http://192.168.1.236:8080/\""
+//            )
 
         }
 

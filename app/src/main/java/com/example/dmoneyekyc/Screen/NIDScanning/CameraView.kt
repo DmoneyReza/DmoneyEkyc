@@ -81,7 +81,7 @@ fun CameraView(
     viewModel: ServiceViewModel = hiltViewModel(),
     navController: NavController,
     onImageCaptured: (Uri) -> Unit,
-    onImageAccept:(Uri)->Unit,
+    onImageAccept:(ImageBitmap)->Unit,
     onOCR:(String)->Unit) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -157,6 +157,7 @@ fun CameraView(
         capturedImage.let { images ->
             images.value?.let {
                 drawAndCropRectangleOnImageBitmap(images.value!!)?.let { image ->
+                    onImageAccept(image)
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -262,14 +263,14 @@ fun CameraView(
 
                 CircleWithIcon(
                     onClick = {
-                        imageUri.value?.let { onImageAccept(it) }
+//                        capturedImage.value?.let { onImageAccept(it) }
                         if(label.value.contains("Font")){
                             viewModel.NIDFront.value = capturedImage.value
 
 //                            viewModel.uploadNidFront(imageUri.value.toString())
                         }else if(label.value.contains("Back")){
                             viewModel.NIDBack.value = capturedImage.value
-                            navController.navigate(AuthRoute.FaceAnalyzer.route){
+                            navController.navigate(AuthRoute.Final.route){
                                 popUpTo(AuthRoute.Home.route){
                                     inclusive = false
                                 }

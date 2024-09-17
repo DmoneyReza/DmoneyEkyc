@@ -63,7 +63,7 @@ class ServiceRepositoryImp @Inject constructor(
         emit(Resource.Loading())
 
         try {
-         val data =    api.getNidInfo()
+         val data =    api.getNidInfo(requestBody)
           emit(Resource.Success(data = data))
         }catch (ex:retrofit2.HttpException){
             val errorMessage = when (ex.code()) {

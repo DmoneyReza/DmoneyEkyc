@@ -27,7 +27,7 @@ class AuthModule {
     @Singleton
     fun provideOkHttpInstance():OkHttpClient{
         val logginIncepter = HttpLoggingInterceptor()
-        logginIncepter.setLevel(HttpLoggingInterceptor.Level.BASIC)
+        logginIncepter.setLevel(HttpLoggingInterceptor.Level.BODY)
 
         val client  = OkHttpClient.Builder()
             .connectTimeout(
