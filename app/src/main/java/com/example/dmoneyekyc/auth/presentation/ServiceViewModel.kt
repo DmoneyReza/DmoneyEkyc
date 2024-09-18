@@ -105,6 +105,8 @@ class ServiceViewModel @Inject constructor(
                             dob = resource.data.toNidMainModel().dob!!
                         )
                     }
+
+                    else -> {}
                 }
             }.launchIn(this)
         }
@@ -151,6 +153,8 @@ class ServiceViewModel @Inject constructor(
                                 data = resources.data!!,
                             )
                         }
+
+                        else -> {}
                     }
 
                 }.launchIn(this)
