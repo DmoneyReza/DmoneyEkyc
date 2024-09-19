@@ -128,13 +128,13 @@ fun FaceScanningScreen(
             face.headEulerAngleY < -headMovementThreshold -> "Left"
             face.headEulerAngleX > headMovementThreshold -> "Up"
             face.headEulerAngleX < -headMovementThreshold -> "Down"
-            face.headEulerAngleY < 1.0f && face.headEulerAngleY > -1.0f -> "Front"
+//            face.headEulerAngleY < 1.0f && face.headEulerAngleY > -1.0f -> "Front"
 
             else -> "None"
         }
 
-        if (face.leftEyeOpenProbability!! > 0.5f && face.leftEyeOpenProbability!! > 0.5f) {
-
+        if (face.leftEyeOpenProbability!! > 0.6f && face.leftEyeOpenProbability!! > 0.6f &&  face.headEulerAngleY < 1.0f && face.headEulerAngleY> -1.0f ) {
+            headMovement.value = "Front"
             Log.d("leftEyeOpenProbability", "FaceScanningScreen: " + "Eye Open")
             if (selectedImage.value == null) {
 

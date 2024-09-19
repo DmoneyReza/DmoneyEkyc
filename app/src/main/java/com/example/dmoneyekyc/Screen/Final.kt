@@ -45,7 +45,7 @@ fun Final(
             painter = painter,
             contentDescription = null,
             modifier = Modifier
-                .size(200.dp)
+                .fillMaxSize()
                 .rotate(270f)
                 .padding(16.dp) // Adjust padding as needed
         )
