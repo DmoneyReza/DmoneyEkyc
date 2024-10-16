@@ -1,6 +1,7 @@
 package com.example.dmoney.di
 
 import android.content.Context
+import com.example.dmoney.auth.util.DeviceIdManager
 import com.example.dmoney.util.ConnectivityObserver
 import com.example.dmoney.util.LocalStorageService
 import com.example.dmoney.util.DmNetworkConnectivityObserver
@@ -25,6 +26,11 @@ class AppModule {
     @Singleton
     fun provideNetworkManager(@ApplicationContext context: Context): ConnectivityObserver {
         return DmNetworkConnectivityObserver(context)
+    }
+    @Provides
+    @Singleton
+    fun provideLocation(@ApplicationContext context: Context): DeviceIdManager {
+        return DeviceIdManager(context)
     }
 
 }

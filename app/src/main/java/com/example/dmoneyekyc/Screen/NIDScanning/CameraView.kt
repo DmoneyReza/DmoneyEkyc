@@ -39,8 +39,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -71,7 +74,11 @@ import androidx.navigation.NavController
 import com.example.dmoney.auth.presentation.ServiceViewModel
 import com.example.dmoney.navigation.route.AuthRoute
 import com.example.dmoneyekyc.R
+import com.example.dmoneyekyc.Screen.NIDScanning.presentation.NidProcessViewModel
+import com.example.dmoneyekyc.Screen.NIDScanning.presentation.NidScanUiEvent
+import com.example.dmoneyekyc.util.GifImage
 import com.example.imagetotextextractor.utlis.OCR.PerformOCR
+import kotlinx.coroutines.flow.collectLatest
 
 
 import java.io.File
@@ -82,7 +89,9 @@ fun CameraView(
     navController: NavController,
     onImageCaptured: (Uri) -> Unit,
     onImageAccept:(ImageBitmap)->Unit,
-    onOCR:(String)->Unit) {
+    onOCR:(String)->Unit,
+    nidProcessViewModel: NidProcessViewModel
+    ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -96,6 +105,42 @@ fun CameraView(
     }
     var instruction = remember {
         mutableStateOf("Place & hold your NID card front side within the frame and take a photo")
+    }
+    var isOcrErrorDialogShow by remember { mutableStateOf(false) }
+    var isNidPostErrorDialogShow by remember { mutableStateOf(false) }
+
+    LaunchedEffect(key1 = true) {
+        nidProcessViewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                NidScanUiEvent.NidPostEventFailed -> {
+                    isNidPostErrorDialogShow = true
+                }
+                NidScanUiEvent.NidPostEventSuccess -> {
+                    capturedImage.value = null
+                    label.value = "NID Back Side Capture"
+                    instruction.value =
+                        "Place & hold your NID card back side within the frame and take a photo"
+                    Toast.makeText(context,nidProcessViewModel.responseTime.value + " seconds",Toast.LENGTH_SHORT).show()
+                }
+
+                NidScanUiEvent.OcrEventFailed -> {}
+                NidScanUiEvent.OcrEventSuccess -> {
+
+                }
+
+                is NidScanUiEvent.NidBackPostEventSuccess -> {
+                    navController.navigate(AuthRoute.NIDScanData.route+"?nid=${event.nid?:""}"+"?dob=${event.dob ?:""}") {
+                        popUpTo(AuthRoute.SignUp.route) {
+                            inclusive = false
+                        }
+                    }
+                }
+
+
+            }
+
+        }
+
     }
 
 
@@ -157,7 +202,7 @@ fun CameraView(
         capturedImage.let { images ->
             images.value?.let {
                 drawAndCropRectangleOnImageBitmap(images.value!!)?.let { image ->
-                    onImageAccept(image)
+
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -239,6 +284,25 @@ fun CameraView(
          }
      }
 
+        if (nidProcessViewModel.ocrResponseState.value.isLoading ) {
+            Column(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color.White)
+                    .padding(10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                GifImage(
+                    modifier = Modifier
+                        .size(80.dp)
+                        .padding(10.dp),
+                    gifDrawable = R.drawable.dmoney_loader
+                )
+            }
+
+        }
+
 
 
 
@@ -264,8 +328,9 @@ fun CameraView(
                 CircleWithIcon(
                     onClick = {
 //                        capturedImage.value?.let { onImageAccept(it) }
-                        if(label.value.contains("Font")){
-                            viewModel.NIDFront.value = capturedImage.value
+                        if(label.value.contains("Front")){
+                            nidProcessViewModel.NIDFront.value = capturedImage.value
+                            onImageAccept(capturedImage.value!!)
 
 //                            viewModel.uploadNidFront(imageUri.value.toString())
                         }else if(label.value.contains("Back")){
@@ -277,9 +342,9 @@ fun CameraView(
                             }
 
                         }
-                        capturedImage.value = null
-                        label.value = "NID Back Side Capture"
-                        instruction.value = "Place & hold your NID card back side within the frame and take a photo"
+//                        capturedImage.value = null
+//                        label.value = "NID Back Side Capture"
+//                        instruction.value = "Place & hold your NID card back side within the frame and take a photo"
 
 
                     },

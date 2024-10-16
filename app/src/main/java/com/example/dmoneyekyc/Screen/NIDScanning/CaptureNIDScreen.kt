@@ -22,6 +22,7 @@ import androidx.navigation.NavController
 
 import com.example.dmoney.auth.presentation.ServiceViewModel
 import com.example.dmoneyekyc.R
+import com.example.dmoneyekyc.Screen.NIDScanning.presentation.NidProcessViewModel
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import saveBitmapToFile
@@ -33,7 +34,8 @@ import java.util.Locale
 @Composable
 fun CaptureNIDScreen(
     viewModel: ServiceViewModel = hiltViewModel(),
-    navController: NavController
+    navController: NavController,
+    nidProcessViewModel: NidProcessViewModel = hiltViewModel()
 ) {
     val sharedViewModel: ServiceViewModel = hiltViewModel(LocalContext.current as ComponentActivity)
     val context = LocalContext.current
@@ -54,10 +56,14 @@ fun CaptureNIDScreen(
 //                viewModel.NIDFront.value = imageBitmap
                 val inputStream = context.contentResolver.openInputStream(saveBitmapToFile(context, imageBitmap.asAndroidBitmap())!!)
                 val fileRequestBody = inputStream?.readBytes()?.toRequestBody("image/jpeg".toMediaTypeOrNull())
-                sharedViewModel.uploadNidFront(fileRequestBody!!)
+//                sharedViewModel.uploadNidFront(fileRequestBody!!)
+                nidProcessViewModel.deviceIdManager.getLastKnownLocation { location ->
+                    nidProcessViewModel.getOcrInfo(location,fileRequestBody!!)
+                }
             },
             onOCR = {},
-            navController = navController
+            navController = navController,
+            nidProcessViewModel = nidProcessViewModel
         )
 
     }

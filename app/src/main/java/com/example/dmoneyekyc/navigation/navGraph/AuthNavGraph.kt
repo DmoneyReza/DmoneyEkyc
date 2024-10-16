@@ -22,7 +22,7 @@ fun NavGraphBuilder.AuthNavGraph(
 ) {
 
     navigation(
-        startDestination = AuthRoute.FaceAnalyzer.route,
+        startDestination = AuthRoute.NIDScanning.route,
         route = GraphRoute.AuthGraph
     ) {
         composable(

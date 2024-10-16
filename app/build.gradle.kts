@@ -130,4 +130,8 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
 
     implementation ("com.google.mlkit:text-recognition:16.0.0")
+    implementation ("com.github.bumptech.glide:glide:4.11.0")
+    implementation("io.coil-kt:coil-gif:2.6.0")
+    implementation("com.airbnb.android:lottie-compose:6.3.0")
+    implementation ("com.google.android.gms:play-services-location:21.0.1")
 }
