@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -43,11 +44,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -64,6 +67,10 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.dmoney.auth.presentation.ServiceViewModel
 import com.example.dmoney.navigation.route.AuthRoute
 import com.example.dmoneyekyc.R
@@ -83,7 +90,7 @@ fun FaceScanningScreen(
     navController: NavController
 ) {
     val sharedViewModel: ServiceViewModel = hiltViewModel(LocalContext.current as ComponentActivity)
-
+    val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.selfie_loader))
     val context: Context = LocalContext.current
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
     val cameraController: LifecycleCameraController = remember {
@@ -95,7 +102,9 @@ fun FaceScanningScreen(
     val configuration = LocalConfiguration.current
 
     val screenHeight = configuration.screenHeightDp
-
+    val GifSize = remember {
+        mutableStateOf(0f)
+    }
     val headMovement = remember { mutableStateOf("No face detected") }
     val selectedImage = remember { mutableStateOf<Image?>(null) }
     val headMovementThreshold = 10.0f // Threshold for head movement detection
@@ -254,7 +263,7 @@ fun FaceScanningScreen(
             val canvasHeight = size.height
             val radius = minOf(canvasWidth, canvasHeight) / 2.5f
             val centerOffset = Offset(x = size.width / 2, y = size.height / 2)
-
+            GifSize.value = radius
             // Draw the background
             drawContext.canvas.nativeCanvas.apply {
                 drawColor(android.graphics.Color.argb(128, 0, 0, 0))
@@ -374,6 +383,12 @@ fun FaceScanningScreen(
             style = MaterialTheme.typography.titleMedium,
             color = Color.White
         )
+
+
+        LottieAnimation(modifier = Modifier
+            .align(Alignment.Center)
+            .size(GifSize.value.dp / 1.3f, GifSize.value.dp / 1.3f)
+            .clip(CircleShape), contentScale = ContentScale.FillWidth, composition = composition, iterations = LottieConstants.IterateForever )
 
         Box(
             modifier = Modifier

@@ -70,6 +70,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 
 import com.example.dmoney.auth.presentation.ServiceViewModel
 import com.example.dmoney.navigation.route.AuthRoute
@@ -94,6 +98,7 @@ fun CameraView(
     ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.nid_loader))
 
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
     val imageCapture = remember { mutableStateOf<ImageCapture?>(null) }
@@ -197,6 +202,13 @@ fun CameraView(
             width = getScreenSizeDp(LocalContext.current) - 25.dp,
             height = getResizableHeight(0.3, LocalContext.current)
         )
+
+        if(capturedImage.value ==null){
+            LottieAnimation(modifier = Modifier
+                .align(Alignment.Center)
+                .size(width= getScreenSizeDp(LocalContext.current) - 25.dp,height= getResizableHeight(0.3, LocalContext.current))
+                .clip(RoundedCornerShape(16.dp)), contentScale = ContentScale.FillBounds, composition = composition, iterations = LottieConstants.IterateForever )
+        }
 
 
         capturedImage.let { images ->

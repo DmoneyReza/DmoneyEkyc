@@ -23,6 +23,7 @@ class OcrRepositoryImp @Inject constructor(
 
 
             try {
+
                 // Capture the start time
                 val startTime = System.nanoTime()
                 val data  =  apiService.getNidInfo(requestBody)
@@ -42,6 +43,9 @@ class OcrRepositoryImp @Inject constructor(
                 )
 
             }catch (ex:HttpException){
+                emit(Resource.Error(
+                    message = "${ex.message}"
+                ))
 
             }catch (ex:IOException){
 
