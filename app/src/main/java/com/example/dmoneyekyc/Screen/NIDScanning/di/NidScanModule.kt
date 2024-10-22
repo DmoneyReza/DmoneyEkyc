@@ -5,6 +5,7 @@ import com.example.dmoneyekyc.Screen.NIDScanning.data.NidOCRApiService
 import com.example.dmoneyekyc.Screen.NIDScanning.data.OcrRepositoryImp
 import com.example.dmoneyekyc.Screen.NIDScanning.domain.repository.OcrRepository
 import com.example.dmoneyekyc.Screen.NIDScanning.domain.usecase.GetNidOcrUseCase
+import com.example.dmoneyekyc.Screen.NIDScanning.domain.usecase.PostToEcUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -49,6 +50,12 @@ class NidScanModule {
     @Singleton
     fun provideNidOCRUseCase(ocrRepository: OcrRepository): GetNidOcrUseCase {
         return GetNidOcrUseCase(ocrRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun providePostNidEcUseCase(ocrRepository: OcrRepository):PostToEcUseCase{
+        return PostToEcUseCase(ocrRepository)
     }
 
 

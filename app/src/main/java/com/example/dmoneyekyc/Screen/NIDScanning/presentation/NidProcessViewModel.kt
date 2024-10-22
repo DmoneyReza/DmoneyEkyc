@@ -16,6 +16,7 @@ import com.example.dmoney.util.ConnectivityObserver
 import com.example.dmoney.util.LocalStorageService
 
 import com.example.dmoneyekyc.Screen.NIDScanning.domain.usecase.GetNidOcrUseCase
+import com.example.dmoneyekyc.Screen.NIDScanning.domain.usecase.PostToEcUseCase
 import com.example.dmoneyekyc.util.Resource
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,6 +38,7 @@ class NidProcessViewModel @Inject constructor(
     val deviceIdManager: DeviceIdManager,
     val getNidOcrUseCase: GetNidOcrUseCase,
 //    val postNidUseCase: PostNidUseCase
+    val postToEcUseCase: PostToEcUseCase
 ):ViewModel() {
 
     private val _ocrResponseState = mutableStateOf(OcrResponseState())
@@ -91,6 +93,35 @@ class NidProcessViewModel @Inject constructor(
             }.launchIn(this)
         }
     }
+
+
+    fun postNidToEc(
+        nid:String,dob:String
+    ){
+        viewModelScope.launch {
+            val requestBody = MultipartBody.Builder()
+                .setType(MultipartBody.FORM) // Use the file's name
+                .addFormDataPart("NID", nid)
+                .addFormDataPart("DOB", dob)
+                .build()
+
+            postToEcUseCase.invoke(requestBody).onEach { resource ->
+                when(resource){
+                    is Resource.Error -> {}
+                    is Resource.Loading -> {}
+                    is Resource.Success -> {
+                        _eventFlow.emit(NidScanUiEvent.NidPostEventSuccess)
+                    }
+                }
+
+
+            }.launchIn(this)
+        }
+
+
+    }
+
+
 
 //    fun postNidInfo(location: Location?,ocrOCRespondsModel: OCRespondsModel){
 //        viewModelScope.launch {

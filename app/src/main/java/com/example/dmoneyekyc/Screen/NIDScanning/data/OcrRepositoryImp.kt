@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.flow
 import okhttp3.MultipartBody
 import retrofit2.HttpException
 import java.io.IOException
+import java.util.Objects
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -50,10 +51,9 @@ class OcrRepositoryImp @Inject constructor(
             }catch (ex:IOException){
 
             }
-
-
-
-
-
         }
+
+    override suspend fun postToEc(requestBody: MultipartBody): Flow<Resource<Objects>> =flow{
+
+    }
 }
