@@ -6,6 +6,8 @@ import com.example.dmoney.auth.data.remote.repository.ServiceRepositoryImp
 import com.example.dmoney.auth.domain.repository.ServiceRepository
 import com.example.dmoney.auth.domain.usecase.GetAccessTokenCase
 import com.example.dmoneyekyc.BuildConfig
+import com.example.dmoneyekyc.auth.di.RetrofitInstance1
+import com.example.dmoneyekyc.auth.di.RetrofitInstance2
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -50,7 +52,8 @@ class AuthModule {
 
     @Provides
     @Singleton
-    fun provideRetrofitInstance(client :OkHttpClient):Retrofit{
+    @RetrofitInstance1
+    fun provideRetrofitInstance1(client :OkHttpClient):Retrofit{
         val retrofit: Retrofit = Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
@@ -62,7 +65,20 @@ class AuthModule {
 
     @Provides
     @Singleton
-    fun provideAuthApiInstance(retrofit:Retrofit):authApiService{
+    @RetrofitInstance2
+    fun provideRetrofitInstance2(client :OkHttpClient):Retrofit{
+        val retrofit: Retrofit = Retrofit.Builder()
+            .baseUrl(BuildConfig.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(client)
+            .build()
+
+        return retrofit
+    }
+
+    @Provides
+    @Singleton
+    fun provideAuthApiInstance(@RetrofitInstance1  retrofit:Retrofit):authApiService{
         return retrofit.create(authApiService::class.java)
     }
     @Provides

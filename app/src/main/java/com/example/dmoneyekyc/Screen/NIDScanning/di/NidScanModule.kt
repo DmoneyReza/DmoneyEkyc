@@ -6,6 +6,7 @@ import com.example.dmoneyekyc.Screen.NIDScanning.data.OcrRepositoryImp
 import com.example.dmoneyekyc.Screen.NIDScanning.domain.repository.OcrRepository
 import com.example.dmoneyekyc.Screen.NIDScanning.domain.usecase.GetNidOcrUseCase
 import com.example.dmoneyekyc.Screen.NIDScanning.domain.usecase.PostToEcUseCase
+import com.example.dmoneyekyc.auth.di.RetrofitInstance1
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,7 +21,7 @@ class NidScanModule {
 
     @Provides
     @Singleton
-    fun provideNidScanOCRApiService( retrofit: Retrofit): NidOCRApiService {
+    fun provideNidScanOCRApiService(@RetrofitInstance1 retrofit: Retrofit): NidOCRApiService {
         return retrofit.create(NidOCRApiService::class.java)
     }
 

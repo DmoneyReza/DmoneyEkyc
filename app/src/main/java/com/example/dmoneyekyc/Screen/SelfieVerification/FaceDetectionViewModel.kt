@@ -7,11 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dmoney.auth.util.DeviceIdManager
 import com.example.dmoney.feature_ekyc.SelfieVerification.presentation.SelfieUiEvent
-import com.example.dmoney.navigation.route.AuthRoute
-import com.example.dmoney.navigation.route.GraphRoute
 import com.example.dmoney.util.ConnectivityObserver
 import com.example.dmoney.util.LocalStorageService
-import com.example.dmoneyekyc.Screen.SelfieVerification.domain.PostLivelinessUseCase
+import com.example.dmoneyekyc.Screen.SelfieVerification.domain.usecase.GetEcDataUseCase
+import com.example.dmoneyekyc.Screen.SelfieVerification.domain.usecase.PostLivelinessUseCase
 import com.example.dmoneyekyc.Screen.SelfieVerification.presentation.LivelinessResponseState
 import com.example.dmoneyekyc.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,7 +30,8 @@ class FaceDetectionViewModel @Inject constructor(
     private val connectivityObserver: ConnectivityObserver,
     val deviceIdManager: DeviceIdManager,
 
-    val livelinessUseCase: PostLivelinessUseCase
+    val livelinessUseCase: PostLivelinessUseCase,
+    val getEcDataUseCase: GetEcDataUseCase
 ): ViewModel()  {
     val localStorage = localStorage
 
@@ -40,6 +40,26 @@ class FaceDetectionViewModel @Inject constructor(
 
     private val _eventFlow = MutableSharedFlow<SelfieUiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
+
+
+
+    fun getEcData(location: Location?, body: RequestBody){
+            viewModelScope.launch {
+                getEcDataUseCase.invoke().onEach {resource ->
+                    when(resource){
+                        is Resource.Error ->{}
+                        is Resource.Loading -> {}
+                        is Resource.Success -> {
+
+                            postLiveliness(location,body)
+                        }
+                    }
+
+                }.launchIn(this)
+            }
+
+
+    }
 
 
     fun postLiveliness(location: Location?, body: RequestBody){

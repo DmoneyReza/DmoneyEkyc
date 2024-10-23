@@ -1,8 +1,10 @@
 package com.example.dmoneyekyc.Screen.SelfieVerification.di
 import com.example.dmoneyekyc.Screen.SelfieVerification.data.LivelinessApiService
 import com.example.dmoneyekyc.Screen.SelfieVerification.data.SelfieRepositoryImp
-import com.example.dmoneyekyc.Screen.SelfieVerification.domain.PostLivelinessUseCase
+import com.example.dmoneyekyc.Screen.SelfieVerification.domain.usecase.PostLivelinessUseCase
 import com.example.dmoneyekyc.Screen.SelfieVerification.domain.SelfieRepository
+import com.example.dmoneyekyc.Screen.SelfieVerification.domain.usecase.GetEcDataUseCase
+import com.example.dmoneyekyc.auth.di.RetrofitInstance1
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,7 +17,8 @@ import javax.inject.Singleton
 class SelfieModule {
     @Provides
     @Singleton
-    fun provideLivelinessApiService( retrofit: Retrofit): LivelinessApiService {
+
+    fun provideLivelinessApiService(@RetrofitInstance1 retrofit: Retrofit): LivelinessApiService {
         return retrofit.create(LivelinessApiService::class.java)
     }
 
@@ -30,11 +33,11 @@ class SelfieModule {
     fun provideSelfieRepository(livelinessApiService: LivelinessApiService): SelfieRepository {
         return SelfieRepositoryImp(livelinessApiService)
     }
-//    @Provides
-//    @Singleton
-//    fun providePostSelfieUseCase(selfieRepository: SelfieRepository): PostSelfieUseCase {
-//        return PostSelfieUseCase(repository = selfieRepository)
-//    }
+    @Provides
+    @Singleton
+    fun provideGetEcDataUseCase(selfieRepository: SelfieRepository): GetEcDataUseCase {
+        return GetEcDataUseCase(repository = selfieRepository)
+    }
     @Provides
     @Singleton
     fun provideLivelinessUseCase(selfieRepository: SelfieRepository): PostLivelinessUseCase {

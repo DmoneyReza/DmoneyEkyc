@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
+import android.location.Location
 import android.media.Image
 import android.util.Log
 
@@ -78,6 +79,8 @@ import com.example.dmoneyekyc.Screen.SelfieVerification.utli.mediaImageToBitmap
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
 import kotlinx.coroutines.delay
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import saveBitmapToFile
 import saveInputImageAsJpeg
 
@@ -151,6 +154,9 @@ fun FaceScanningScreen(
                 var bitmap = mediaImageToBitmap(image)
                 var uri = saveBitmapToFile(context, bitmap!!)
                 sharedViewModel.eyeOpenFaceImageUri.value = uri
+
+
+
                 Log.i("mediaImageToBitmap", "uri: " + uri)
                 Log.d("leftEyeOpenProbability", "FaceScanningScreen: " + "${selectedImage.value}")
             }
@@ -187,6 +193,14 @@ fun FaceScanningScreen(
 
         if (direction.value == "done") {
             delay(2000) // 2 seconds delay
+
+
+            viewModel.deviceIdManager.getLastKnownLocation { location: Location? ->
+                var bitmap = mediaImageToBitmap(selectedImage.value!!)
+                val inputStream = context.contentResolver.openInputStream( saveBitmapToFile(context, bitmap!!)!!)
+                val fileRequestBody = inputStream?.readBytes()?.toRequestBody("image/jpeg".toMediaTypeOrNull())
+                viewModel.getEcData(location,fileRequestBody!!)
+            }
 
             navController.navigate(AuthRoute.Final.route){
                 popUpTo(AuthRoute.Home.route){

@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import okhttp3.MultipartBody
 import java.io.IOException
+import java.util.Objects
 
 
 class SelfieRepositoryImp(
@@ -18,6 +19,13 @@ class SelfieRepositoryImp(
 ): SelfieRepository {
 
     override suspend fun postLiveliness(requestBody: MultipartBody): Flow<Resource<LivelinessResponseModel>> = flow {
+
+    }
+
+    override suspend fun getEcData(): Flow<Resource<Objects>> = flow {
+    emit(Resource.Success(
+        data = null
+    ))
 
     }
 }
