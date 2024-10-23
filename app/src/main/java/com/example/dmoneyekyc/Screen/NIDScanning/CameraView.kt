@@ -224,17 +224,19 @@ fun CameraView(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
 
-                            PerformOCR( image)
+//                            PerformOCR( image)
 
 
                         Image(
 
                             bitmap = image,
+                            contentScale =ContentScale.FillBounds ,
                             contentDescription = null,
                             modifier = Modifier
                                 .width(width = width)
                                 .height(height)
-                                .padding(10.dp)
+                                .clip(RoundedCornerShape(16.dp))
+
                         )
                     }
 
