@@ -86,7 +86,8 @@ class NidProcessViewModel @Inject constructor(
                         localStorage.putString("nid",ocrResponseState.value.response.data.nidNumber.toString()?:"")
                         localStorage.putString("dob",ocrResponseState.value.response.data.nidDob.toString()?:"")
 //                        postNidInfo(location,resource.data)
-                        _eventFlow.emit(NidScanUiEvent.NidPostEventSuccess)
+                        postNidToEc(ocrResponseState.value.response.data.nidNumber.toString(),ocrResponseState.value.response.data.nidDob.toString())
+//                        _eventFlow.emit(NidScanUiEvent.NidPostEventSuccess)
                     }
                 }
 
@@ -110,7 +111,11 @@ class NidProcessViewModel @Inject constructor(
                     is Resource.Error -> {}
                     is Resource.Loading -> {}
                     is Resource.Success -> {
-                        _eventFlow.emit(NidScanUiEvent.NidPostEventSuccess)
+                        when(resource.data?.status == "OK"){
+                            true ->  _eventFlow.emit(NidScanUiEvent.NidPostEventSuccess)
+                            false ->{}
+                        }
+
                     }
                 }
 

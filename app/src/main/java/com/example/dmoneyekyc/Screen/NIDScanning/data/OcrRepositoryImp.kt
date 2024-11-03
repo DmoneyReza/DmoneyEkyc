@@ -1,6 +1,7 @@
 package com.example.dmoneyekyc.Screen.NIDScanning.data
 
 
+import com.example.dmoneyekyc.Screen.NIDScanning.domain.model.EcPostResponseModel
 import com.example.dmoneyekyc.Screen.NIDScanning.domain.model.OCRespondsModel
 import com.example.dmoneyekyc.Screen.NIDScanning.domain.repository.OcrRepository
 import com.example.dmoneyekyc.util.Resource
@@ -53,7 +54,18 @@ class OcrRepositoryImp @Inject constructor(
             }
         }
 
-    override suspend fun postToEc(requestBody: MultipartBody): Flow<Resource<Objects>> =flow{
+    override suspend fun postToEc(requestBody: MultipartBody): Flow<Resource<EcPostResponseModel>> =flow{
+                emit(Resource.Loading())
 
+
+        try {
+            val data = apiService.postDataToEc(requestBody)
+            emit(Resource.Success(data))
+
+        }catch (ex:HttpException){
+
+        }catch (ex:IOException){
+
+        }
     }
 }

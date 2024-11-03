@@ -349,6 +349,7 @@ fun CameraView(
 //                            viewModel.uploadNidFront(imageUri.value.toString())
                         }else if(label.value.contains("Back")){
                             viewModel.NIDBack.value = capturedImage.value
+
                             navController.navigate(AuthRoute.Final.route){
                                 popUpTo(AuthRoute.Home.route){
                                     inclusive = false
