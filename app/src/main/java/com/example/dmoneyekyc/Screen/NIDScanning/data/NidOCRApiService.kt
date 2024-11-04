@@ -12,8 +12,7 @@ interface NidOCRApiService {
     @POST("api/textExtraction/uploadNID")
     suspend fun getNidInfo(@Body body: MultipartBody): OCRespondsModel
 
-    @POST("NID/NIDRequest")
-    suspend fun  postDataToEc(@Body body: MultipartBody): EcPostResponseModel
+
 
 
 }

@@ -54,7 +54,7 @@ android {
             )
 
             buildConfigField("String","EC_BASE_URL",
-                "\"http://dsandbox.dmoney.com.bd:4040/\""
+                "\"https://sandbox.dmoney.com.bd:5663/\""
             )
 //            buildConfigField("String","BASE_URL",
 //                "\"http://192.168.1.236:8080/\""

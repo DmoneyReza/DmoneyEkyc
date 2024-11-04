@@ -1,12 +1,14 @@
 package com.example.dmoneyekyc.Screen.NIDScanning.di
 
 
+import com.example.dmoneyekyc.Screen.NIDScanning.data.EcPostApiService
 import com.example.dmoneyekyc.Screen.NIDScanning.data.NidOCRApiService
 import com.example.dmoneyekyc.Screen.NIDScanning.data.OcrRepositoryImp
 import com.example.dmoneyekyc.Screen.NIDScanning.domain.repository.OcrRepository
 import com.example.dmoneyekyc.Screen.NIDScanning.domain.usecase.GetNidOcrUseCase
 import com.example.dmoneyekyc.Screen.NIDScanning.domain.usecase.PostToEcUseCase
 import com.example.dmoneyekyc.auth.di.RetrofitInstance1
+import com.example.dmoneyekyc.auth.di.RetrofitInstance2
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,16 +28,16 @@ class NidScanModule {
     }
 
 
-//    @Provides
-//    @Singleton
-//    fun provideNIDPostApiService(@RetrofitInstance1 retrofit: Retrofit):NidPostApiService{
-//        return retrofit.create(NidPostApiService::class.java)
-//    }
+    @Provides
+    @Singleton
+    fun provideNIDPostApiService(@RetrofitInstance2 retrofit: Retrofit):EcPostApiService{
+        return retrofit.create(EcPostApiService::class.java)
+    }
 
     @Provides
     @Singleton
-    fun provideNidOcrRepository(nidOCRApiService: NidOCRApiService): OcrRepository {
-        return  OcrRepositoryImp(nidOCRApiService)
+    fun provideNidOcrRepository(nidOCRApiService: NidOCRApiService,ecPostApiService: EcPostApiService): OcrRepository {
+        return  OcrRepositoryImp(nidOCRApiService,ecPostApiService)
     }
 //    @Provides
 //    @Singleton

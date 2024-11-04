@@ -5,18 +5,17 @@ import com.example.dmoneyekyc.Screen.NIDScanning.domain.model.EcPostResponseMode
 import com.example.dmoneyekyc.Screen.NIDScanning.domain.model.OCRespondsModel
 import com.example.dmoneyekyc.Screen.NIDScanning.domain.repository.OcrRepository
 import com.example.dmoneyekyc.util.Resource
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import okhttp3.MultipartBody
 import retrofit2.HttpException
 import java.io.IOException
-import java.util.Objects
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class OcrRepositoryImp @Inject constructor(
-    val apiService: NidOCRApiService
+    val apiService: NidOCRApiService,
+   val ecPostApiService: EcPostApiService
 ) : OcrRepository {
 
     override suspend fun getNidInfo(requestBody: MultipartBody): Flow<Resource<OCRespondsModel>> =
@@ -59,7 +58,7 @@ class OcrRepositoryImp @Inject constructor(
 
 
         try {
-            val data = apiService.postDataToEc(requestBody)
+            val data = ecPostApiService.postDataToEc(requestBody)
             emit(Resource.Success(data))
 
         }catch (ex:HttpException){

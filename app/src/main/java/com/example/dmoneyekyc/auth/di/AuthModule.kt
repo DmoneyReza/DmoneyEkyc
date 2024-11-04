@@ -68,7 +68,7 @@ class AuthModule {
     @RetrofitInstance2
     fun provideRetrofitInstance2(client :OkHttpClient):Retrofit{
         val retrofit: Retrofit = Retrofit.Builder()
-            .baseUrl(BuildConfig.BASE_URL)
+            .baseUrl(BuildConfig.EC_BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()

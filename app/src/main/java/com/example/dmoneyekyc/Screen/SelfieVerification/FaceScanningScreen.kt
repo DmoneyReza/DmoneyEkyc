@@ -73,12 +73,14 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.dmoney.auth.presentation.ServiceViewModel
+import com.example.dmoney.feature_ekyc.SelfieVerification.presentation.SelfieUiEvent
 import com.example.dmoney.navigation.route.AuthRoute
 import com.example.dmoneyekyc.R
 import com.example.dmoneyekyc.Screen.SelfieVerification.utli.mediaImageToBitmap
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import saveBitmapToFile
@@ -128,6 +130,24 @@ fun FaceScanningScreen(
         }
     }
 
+    LaunchedEffect(key1 = true) {
+        viewModel.eventFlow.collectLatest { value: SelfieUiEvent ->
+            when(value){
+                SelfieUiEvent.eventLivelinessFailed -> {}
+                SelfieUiEvent.eventLivelinessSuccess ->{}
+                SelfieUiEvent.eventSelfieFailed ->{}
+                SelfieUiEvent.eventSelfieSuccess -> {
+                    navController.navigate(AuthRoute.Final.route){
+                        popUpTo(AuthRoute.Home.route){
+                            inclusive = false
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
 
 
     fun onTextUpdated(face: Face, image: Image) {
@@ -150,13 +170,13 @@ fun FaceScanningScreen(
             if (selectedImage.value == null) {
 
                 selectedImage.value = image
-                var bitmap = mediaImageToBitmap(image)
-                var uri = saveBitmapToFile(context, bitmap!!)
-                sharedViewModel.eyeOpenFaceImageUri.value = uri
+//                var bitmap = mediaImageToBitmap(image)
+//                var uri = saveBitmapToFile(context, bitmap!!)
+//                sharedViewModel.eyeOpenFaceImageUri.value = uri
 
 
 
-                Log.i("mediaImageToBitmap", "uri: " + uri)
+//                Log.i("mediaImageToBitmap", "uri: " + uri)
                 Log.d("leftEyeOpenProbability", "FaceScanningScreen: " + "${selectedImage.value}")
             }
         }
@@ -192,20 +212,20 @@ fun FaceScanningScreen(
 
         if (direction.value == "done") {
             delay(2000) // 2 seconds delay
+            var bitmap = mediaImageToBitmap(selectedImage.value!!)
+            val inputStream = context.contentResolver.openInputStream( saveBitmapToFile(context, bitmap!!)!!)
+            val fileRequestBody = inputStream?.readBytes()?.toRequestBody("image/jpeg".toMediaTypeOrNull())
+            viewModel.getEcData(null,fileRequestBody!! ,context)
 
+//            viewModel.deviceIdManager.getLastKnownLocation { location: Location? ->
+//
+//            }
 
-            viewModel.deviceIdManager.getLastKnownLocation { location: Location? ->
-                var bitmap = mediaImageToBitmap(selectedImage.value!!)
-                val inputStream = context.contentResolver.openInputStream( saveBitmapToFile(context, bitmap!!)!!)
-                val fileRequestBody = inputStream?.readBytes()?.toRequestBody("image/jpeg".toMediaTypeOrNull())
-                viewModel.getEcData(location,fileRequestBody!! ,context)
-            }
-
-            navController.navigate(AuthRoute.Final.route){
-                popUpTo(AuthRoute.Home.route){
-                    inclusive = false
-                }
-            }
+//            navController.navigate(AuthRoute.Final.route){
+//                popUpTo(AuthRoute.Home.route){
+//                    inclusive = false
+//                }
+//            }
 
         }
 

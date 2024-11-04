@@ -17,6 +17,7 @@ import com.example.dmoney.util.LocalStorageService
 
 import com.example.dmoneyekyc.Screen.NIDScanning.domain.usecase.GetNidOcrUseCase
 import com.example.dmoneyekyc.Screen.NIDScanning.domain.usecase.PostToEcUseCase
+import com.example.dmoneyekyc.Screen.SelfieVerification.utli.changeDateFormat
 import com.example.dmoneyekyc.util.Resource
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -83,8 +84,10 @@ class NidProcessViewModel @Inject constructor(
                         responseTime.value = resource.time!!
 
                         Log.d("_ocrResponseState", "getOcrInfo: " + Gson().toJson(ocrResponseState.value.response))
+
+                        val formattedDate = changeDateFormat(ocrResponseState.value.response.data.nidDob.toString(), "dd MMM yyyy", "dd/MM/yyyy")
                         localStorage.putString("nid",ocrResponseState.value.response.data.nidNumber.toString()?:"")
-                        localStorage.putString("dob",ocrResponseState.value.response.data.nidDob.toString()?:"")
+                        localStorage.putString("dob",formattedDate?:"")
 //                        postNidInfo(location,resource.data)
 //                        postNidToEc(ocrResponseState.value.response.data.nidNumber.toString(),ocrResponseState.value.response.data.nidDob.toString())
                         _eventFlow.emit(NidScanUiEvent.NidPostEventSuccess)

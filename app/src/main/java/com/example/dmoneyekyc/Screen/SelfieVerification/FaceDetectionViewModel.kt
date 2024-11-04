@@ -16,6 +16,7 @@ import com.example.dmoneyekyc.Screen.SelfieVerification.presentation.EcResponseS
 import com.example.dmoneyekyc.Screen.SelfieVerification.presentation.LivelinessResponseState
 import com.example.dmoneyekyc.Screen.SelfieVerification.utli.base64ToImageBitmap
 import com.example.dmoneyekyc.util.Resource
+import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -74,6 +75,10 @@ class FaceDetectionViewModel @Inject constructor(
                             )
                             val inputStream = context.contentResolver.openInputStream(saveBitmapToFile(context, base64ToImageBitmap(resource.data.scrappedData!!.imageByte)!!)!!)
                             val ecImage = inputStream?.readBytes()?.toRequestBody("image/jpeg".toMediaTypeOrNull())
+                            val ecImgaeGson  = Gson().toJson(ecImage)
+                            val ecData  = Gson().toJson(resource.data!!)
+                            localStorage.putString("ecImage",ecImgaeGson)
+                            localStorage.putString("ecData",ecData)
 
 
 
@@ -93,8 +98,8 @@ class FaceDetectionViewModel @Inject constructor(
 
             val requestBody = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("file", "output_image.jpg", ecImage!!)
-                .addFormDataPart("file", "output_image.jpg", livelinessImage)
+                .addFormDataPart("nidImage", "output_image.jpg", ecImage!!)
+                .addFormDataPart("normalImage", "output_image.jpg", livelinessImage)
                 .build()
             livelinessUseCase.invoke(requestBody).onEach {resource ->
                 when(resource){

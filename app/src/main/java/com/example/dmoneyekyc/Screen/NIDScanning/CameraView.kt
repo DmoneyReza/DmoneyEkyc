@@ -134,10 +134,16 @@ fun CameraView(
                 }
 
                 is NidScanUiEvent.NidBackPostEventSuccess -> {
-                    navController.navigate(AuthRoute.NIDScanData.route+"?nid=${event.nid?:""}"+"?dob=${event.dob ?:""}") {
-                        popUpTo(AuthRoute.SignUp.route) {
+//                    navController.navigate(AuthRoute.NIDScanData.route+"?nid=${event.nid?:""}"+"?dob=${event.dob ?:""}") {
+//                        popUpTo(AuthRoute.SignUp.route) {
+//                            inclusive = false
+//                        }
+//                    }
+                    navController.navigate(AuthRoute.FaceAnalyzer.route){
+                        popUpTo(AuthRoute.NIDScanning.route){
                             inclusive = false
                         }
+
                     }
                 }
 
