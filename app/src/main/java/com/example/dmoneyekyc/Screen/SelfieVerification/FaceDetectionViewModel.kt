@@ -1,5 +1,6 @@
 package com.example.dmoney.feature.SelfieVerification
 
+import android.content.Context
 import android.location.Location
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
@@ -11,7 +12,9 @@ import com.example.dmoney.util.ConnectivityObserver
 import com.example.dmoney.util.LocalStorageService
 import com.example.dmoneyekyc.Screen.SelfieVerification.domain.usecase.GetEcDataUseCase
 import com.example.dmoneyekyc.Screen.SelfieVerification.domain.usecase.PostLivelinessUseCase
+import com.example.dmoneyekyc.Screen.SelfieVerification.presentation.EcResponseState
 import com.example.dmoneyekyc.Screen.SelfieVerification.presentation.LivelinessResponseState
+import com.example.dmoneyekyc.Screen.SelfieVerification.utli.base64ToImageBitmap
 import com.example.dmoneyekyc.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -19,8 +22,11 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import saveBitmapToFile
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,25 +39,45 @@ class FaceDetectionViewModel @Inject constructor(
     val livelinessUseCase: PostLivelinessUseCase,
     val getEcDataUseCase: GetEcDataUseCase
 ): ViewModel()  {
+
     val localStorage = localStorage
 
     private val _livelinessResponseStae = mutableStateOf(LivelinessResponseState())
     val livelinessResponseState = _livelinessResponseStae
+
+    private val _ecResposneState = mutableStateOf(EcResponseState())
+    val ecResponseState = _ecResposneState
 
     private val _eventFlow = MutableSharedFlow<SelfieUiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
 
 
-    fun getEcData(location: Location?, body: RequestBody){
+    fun getEcData(location: Location?, body: RequestBody, context: Context){
             viewModelScope.launch {
-                getEcDataUseCase.invoke().onEach {resource ->
+                getEcDataUseCase.invoke(localStorage.getString("nid").toString(),localStorage.getString("dob").toString()).onEach {resource ->
                     when(resource){
-                        is Resource.Error ->{}
-                        is Resource.Loading -> {}
+                        is Resource.Error ->{
+                            _ecResposneState.value = ecResponseState.value.copy(
+                                isLoading = false
+                            )
+                        }
+                        is Resource.Loading -> {
+                            _ecResposneState.value = ecResponseState.value.copy(
+                                isLoading = true
+                            )
+                        }
                         is Resource.Success -> {
+                            _ecResposneState.value = ecResponseState.value.copy(
+                                isLoading = false,
+                                response = resource.data!!
+                            )
+                            val inputStream = context.contentResolver.openInputStream(saveBitmapToFile(context, base64ToImageBitmap(resource.data.scrappedData!!.imageByte)!!)!!)
+                            val ecImage = inputStream?.readBytes()?.toRequestBody("image/jpeg".toMediaTypeOrNull())
 
-                            postLiveliness(location,body)
+
+
+                            postLiveliness(location,body,ecImage)
                         }
                     }
 
@@ -62,17 +88,21 @@ class FaceDetectionViewModel @Inject constructor(
     }
 
 
-    fun postLiveliness(location: Location?, body: RequestBody){
+    fun postLiveliness(location: Location?, livelinessImage: RequestBody, ecImage: RequestBody?){
         viewModelScope.launch {
 
             val requestBody = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("file", "output_image.jpg", body)
-                .addFormDataPart("file", "output_image.jpg", body)
+                .addFormDataPart("file", "output_image.jpg", ecImage!!)
+                .addFormDataPart("file", "output_image.jpg", livelinessImage)
                 .build()
             livelinessUseCase.invoke(requestBody).onEach {resource ->
                 when(resource){
-                    is Resource.Error -> {}
+                    is Resource.Error -> {
+                        _livelinessResponseStae.value = livelinessResponseState.value.copy(
+                            isLoading = false
+                        )
+                    }
                     is Resource.Loading -> {
                         _livelinessResponseStae.value = livelinessResponseState.value.copy(
                             isLoading = true

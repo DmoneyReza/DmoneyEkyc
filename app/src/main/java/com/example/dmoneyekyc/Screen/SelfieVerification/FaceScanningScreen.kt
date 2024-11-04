@@ -82,7 +82,6 @@ import kotlinx.coroutines.delay
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import saveBitmapToFile
-import saveInputImageAsJpeg
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -199,7 +198,7 @@ fun FaceScanningScreen(
                 var bitmap = mediaImageToBitmap(selectedImage.value!!)
                 val inputStream = context.contentResolver.openInputStream( saveBitmapToFile(context, bitmap!!)!!)
                 val fileRequestBody = inputStream?.readBytes()?.toRequestBody("image/jpeg".toMediaTypeOrNull())
-                viewModel.getEcData(location,fileRequestBody!!)
+                viewModel.getEcData(location,fileRequestBody!! ,context)
             }
 
             navController.navigate(AuthRoute.Final.route){

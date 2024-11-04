@@ -7,9 +7,8 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
-interface LivelinessApiService {
+interface EcApiService {
 
-    @POST("api/faceExtraction/matchFace")
-    suspend fun postLiveliness(@Body  body: MultipartBody): LivelinessResponseModel
-
+    @GET("nid/niddata")
+    suspend fun getEcData(@Query ("nid") nid:String,@Query ("dob") dob:String) :EcResponseModel
 }

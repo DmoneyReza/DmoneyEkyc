@@ -349,12 +349,13 @@ fun CameraView(
 //                            viewModel.uploadNidFront(imageUri.value.toString())
                         }else if(label.value.contains("Back")){
                             viewModel.NIDBack.value = capturedImage.value
+                            nidProcessViewModel.postNidToEc(nidProcessViewModel.localStorage.getString("nid").toString(),nidProcessViewModel.localStorage.getString("dob").toString())
 
-                            navController.navigate(AuthRoute.Final.route){
-                                popUpTo(AuthRoute.Home.route){
-                                    inclusive = false
-                                }
-                            }
+//                            navController.navigate(AuthRoute.Final.route){
+//                                popUpTo(AuthRoute.Home.route){
+//                                    inclusive = false
+//                                }
+//                            }
 
                         }
 //                        capturedImage.value = null

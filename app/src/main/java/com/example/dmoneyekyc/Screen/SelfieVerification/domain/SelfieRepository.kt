@@ -13,7 +13,7 @@ interface SelfieRepository {
 
     suspend fun postLiveliness(requestBody: MultipartBody):Flow<Resource<LivelinessResponseModel>>
 
-    suspend fun getEcData():Flow<Resource<Objects>>
+    suspend fun getEcData(nid:String,dob:String):Flow<Resource<EcResponseModel>>
 
 
 }
