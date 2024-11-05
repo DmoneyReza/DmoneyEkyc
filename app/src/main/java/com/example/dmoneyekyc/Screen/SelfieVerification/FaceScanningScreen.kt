@@ -165,19 +165,20 @@ fun FaceScanningScreen(
         }
 
         if (face.leftEyeOpenProbability!! > 0.6f && face.leftEyeOpenProbability!! > 0.6f &&  face.headEulerAngleY < 1.0f && face.headEulerAngleY> -1.0f ) {
-            headMovement.value = "Front"
+
             Log.d("leftEyeOpenProbability", "FaceScanningScreen: " + "Eye Open")
             if (selectedImage.value == null) {
 
                 selectedImage.value = image
-//                var bitmap = mediaImageToBitmap(image)
-//                var uri = saveBitmapToFile(context, bitmap!!)
-//                sharedViewModel.eyeOpenFaceImageUri.value = uri
+                var bitmap = mediaImageToBitmap(image)
+                var uri = saveBitmapToFile(context, bitmap!!)
+                sharedViewModel.eyeOpenFaceImageUri.value = uri
 
 
 
-//                Log.i("mediaImageToBitmap", "uri: " + uri)
+                Log.i("mediaImageToBitmap", "uri: " + uri)
                 Log.d("leftEyeOpenProbability", "FaceScanningScreen: " + "${selectedImage.value}")
+                headMovement.value = "Front"
             }
         }
 //        if(face.leftEyeOpenProbability!! < 0.1f && face.leftEyeOpenProbability!! < 0.1f){
@@ -212,8 +213,8 @@ fun FaceScanningScreen(
 
         if (direction.value == "done") {
             delay(2000) // 2 seconds delay
-            var bitmap = mediaImageToBitmap(selectedImage.value!!)
-            val inputStream = context.contentResolver.openInputStream( saveBitmapToFile(context, bitmap!!)!!)
+//            var bitmap = mediaImageToBitmap(selectedImage.value!!)
+            val inputStream = context.contentResolver.openInputStream(sharedViewModel.eyeOpenFaceImageUri.value!!)
             val fileRequestBody = inputStream?.readBytes()?.toRequestBody("image/jpeg".toMediaTypeOrNull())
             viewModel.getEcData(null,fileRequestBody!! ,context)
 

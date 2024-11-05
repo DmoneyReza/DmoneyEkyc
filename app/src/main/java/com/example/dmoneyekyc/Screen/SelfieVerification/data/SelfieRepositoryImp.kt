@@ -18,7 +18,29 @@ class SelfieRepositoryImp(
 ): SelfieRepository {
 
     override suspend fun postLiveliness(requestBody: MultipartBody): Flow<Resource<LivelinessResponseModel>> = flow {
+        emit(Resource.Loading())
+        try {
+            val data  = livelinessApiService.postLiveliness(requestBody)
 
+            emit(
+                Resource.Success(
+                    data =data,
+                )
+            )
+
+        }catch (ex: HttpException){
+            emit(Resource.Error(
+                message = ex.message()
+            ))
+
+        }catch (ex:IOException){
+            emit(
+                Resource.Error(
+                    message = ex.message!!
+                )
+            )
+
+        }
 
     }
 
