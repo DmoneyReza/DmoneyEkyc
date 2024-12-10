@@ -1,6 +1,8 @@
 package com.example.imagetotextextractor.utlis.working
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -40,7 +42,6 @@ fun CaptureNIDScreen(
     val sharedViewModel: ServiceViewModel = hiltViewModel(LocalContext.current as ComponentActivity)
     val context = LocalContext.current
     val imageCapture = remember { mutableStateOf<ImageCapture?>(null) }
-    val outputDirectory = getOutputDirectory(context)
 
 
 
@@ -51,10 +52,14 @@ fun CaptureNIDScreen(
 
         },
             onImageAccept = {imageBitmap ->
-
-
+//
+//                Log.d("imageBitmap", "width: " + imageBitmap.width )
+//                Log.d("imageBitmap", "height: " + imageBitmap.height )
 //                viewModel.NIDFront.value = imageBitmap
-                val inputStream = context.contentResolver.openInputStream(saveBitmapToFile(context, imageBitmap.asAndroidBitmap())!!)
+
+
+                val inputStream = context.contentResolver.openInputStream(saveBitmapToFile(context,
+                    resizeBitmapToFitMaxSize(imageBitmap.asAndroidBitmap()) )!!)
                 val fileRequestBody = inputStream?.readBytes()?.toRequestBody("image/jpeg".toMediaTypeOrNull())
 //                sharedViewModel.uploadNidFront(fileRequestBody!!)
                 nidProcessViewModel.deviceIdManager.getLastKnownLocation { location ->
@@ -69,10 +74,59 @@ fun CaptureNIDScreen(
     }
 }
 
-fun getOutputDirectory(context: Context): File {
-    val mediaDir = context.externalMediaDirs.firstOrNull()?.let {
-        File(it, context.resources.getString(R.string.app_name)).apply { mkdirs() }
+
+
+
+fun getImageDimensions(context: Context, imageUri: Uri): Pair<Int, Int>? {
+    val inputStream = context.contentResolver.openInputStream(imageUri)
+    inputStream?.use { stream ->
+        val options = BitmapFactory.Options().apply {
+            inJustDecodeBounds = true // Decode only bounds, not the full bitmap
+        }
+        BitmapFactory.decodeStream(stream, null, options)
+
+        // Width and height of the image
+        val width = options.outWidth
+        val height = options.outHeight
+
+        if (width > 0 && height > 0) {
+            Log.d("getImageDimensions", "width: " + width )
+            Log.d("getImageDimensions", "height: " + height )
+
+            return Pair(width, height)
+        }
     }
-    return if (mediaDir != null && mediaDir.exists())
-        mediaDir else context.filesDir
+    return null // Return null if dimensions could not be determined
 }
+
+
+
+fun resizeBitmapToFitMaxSize(imageBitmap: Bitmap, maxDimension: Int = 1024): Bitmap {
+    val width = imageBitmap.width
+    val height = imageBitmap.height
+
+    if (width <= maxDimension && height <= maxDimension) {
+        // If already within the size limit, return the original bitmap
+        return imageBitmap
+    }
+
+    // Calculate the new dimensions while maintaining the aspect ratio
+    val aspectRatio = width.toFloat() / height.toFloat()
+    val newWidth: Int
+    val newHeight: Int
+
+    if (width > height) {
+        newWidth = maxDimension
+        newHeight = (maxDimension / aspectRatio).toInt()
+    } else {
+        newHeight = maxDimension
+        newWidth = (maxDimension * aspectRatio).toInt()
+    }
+
+    // Resize the bitmap
+    return Bitmap.createScaledBitmap(imageBitmap, newWidth, newHeight, true)
+}
+
+
+
+

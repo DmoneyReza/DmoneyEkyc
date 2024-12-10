@@ -15,7 +15,7 @@ fun saveBitmapToFile(context: Context, bitmap: Bitmap): Uri? {
         // Create a file in the cache directory for the image
         val file = File(context.cacheDir, "output_image.jpg")
         FileOutputStream(file).use { out ->
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, out) // Compress bitmap as JPEG
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out) // Compress bitmap as JPEG
         }
 
         // Return the Uri using FileProvider (assuming it's set up in AndroidManifest)

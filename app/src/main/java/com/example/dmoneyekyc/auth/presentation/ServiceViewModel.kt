@@ -1,6 +1,7 @@
 package com.example.dmoney.auth.presentation
 
 import android.Manifest
+import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
@@ -57,7 +58,7 @@ class ServiceViewModel @Inject constructor(
     val NIDBack = mutableStateOf<ImageBitmap?>(null)
     val NIDBackOCR = mutableStateOf("")
 
-    val BirthCertificate = mutableStateOf<ImageBitmap?>(null)
+    val selfiBitmap = mutableStateOf<Bitmap?>(null)
 
 
     val eyeOpenFaceImageUri = mutableStateOf<Uri?>(null);

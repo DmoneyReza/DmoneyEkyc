@@ -56,7 +56,13 @@ class FaceDetectionViewModel @Inject constructor(
 
     fun getEcData(location: Location?, body: RequestBody, context: Context){
             viewModelScope.launch {
-                getEcDataUseCase.invoke(localStorage.getString("nid").toString(),localStorage.getString("dob").toString()).onEach {resource ->
+                getEcDataUseCase.invoke(
+                    "3282735244",
+                    "15/11/1994"
+//                    localStorage.getString("nid").toString(),
+//                    localStorage.getString("dob").toString()
+
+                ).onEach {resource ->
                     when(resource){
                         is Resource.Error ->{
                             _ecResposneState.value = ecResponseState.value.copy(
@@ -73,14 +79,14 @@ class FaceDetectionViewModel @Inject constructor(
                                 isLoading = false,
                                 response = resource.data!!
                             )
+
+                            localStorage.putString("getEcData",resource.time!!)
                             val inputStream = context.contentResolver.openInputStream(saveBitmapToFile(context, base64ToImageBitmap(resource.data.scrappedData!!.imageByte)!!)!!)
                             val ecImage = inputStream?.readBytes()?.toRequestBody("image/jpeg".toMediaTypeOrNull())
                             val ecImgaeGson  = Gson().toJson(ecImage)
-                            val ecData  = Gson().toJson(resource.data!!)
+                            val ecData  = Gson().toJson(resource.data.scrappedData!!)
                             localStorage.putString("ecImage",ecImgaeGson)
                             localStorage.putString("ecData",ecData)
-
-
 
                             postLiveliness(location,body,ecImage)
                         }
@@ -98,8 +104,8 @@ class FaceDetectionViewModel @Inject constructor(
 
             val requestBody = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("nidImage", "output_image.jpg", ecImage!!)
-                .addFormDataPart("normalImage", "output_image.jpg", livelinessImage)
+                .addFormDataPart("known_image", "output_image.jpg", ecImage!!)
+                .addFormDataPart("face_to_check", "selfie.jpg", livelinessImage)
                 .build()
             livelinessUseCase.invoke(requestBody).onEach {resource ->
                 when(resource){
@@ -115,8 +121,13 @@ class FaceDetectionViewModel @Inject constructor(
                     }
                     is Resource.Success -> {
                         _livelinessResponseStae.value = livelinessResponseState.value.copy(
-                            isLoading = false
+                            isLoading = false,
+                            response = resource.data!!
                         )
+                        localStorage.putString("postLiveliness",resource.time!!)
+                        localStorage.putString("selfie",Gson().toJson(livelinessImage))
+                        localStorage.putString("livliness",Gson().toJson(resource.data))
+
                         _eventFlow.emit(SelfieUiEvent.eventLivelinessSuccess)
                     }
                 }

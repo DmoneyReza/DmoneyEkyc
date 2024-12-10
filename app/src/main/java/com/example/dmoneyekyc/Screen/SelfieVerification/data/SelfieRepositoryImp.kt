@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.flow
 import okhttp3.MultipartBody
 import retrofit2.HttpException
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 
 class SelfieRepositoryImp(
@@ -20,11 +21,17 @@ class SelfieRepositoryImp(
     override suspend fun postLiveliness(requestBody: MultipartBody): Flow<Resource<LivelinessResponseModel>> = flow {
         emit(Resource.Loading())
         try {
+            val startTime = System.nanoTime()
             val data  = livelinessApiService.postLiveliness(requestBody)
+             val endTime = System.nanoTime()
+
+            // Calculate the duration in seconds
+            val durationInSeconds = TimeUnit.NANOSECONDS.toSeconds(endTime - startTime)
 
             emit(
                 Resource.Success(
                     data =data,
+                    time = durationInSeconds.toString()
                 )
             )
 
@@ -48,11 +55,17 @@ class SelfieRepositoryImp(
 
         emit(Resource.Loading())
         try {
+            val startTime = System.nanoTime()
             val data  = ecApiService.getEcData(nid,dob)
+            val endTime = System.nanoTime()
+
+            // Calculate the duration in seconds
+            val durationInSeconds = TimeUnit.NANOSECONDS.toSeconds(endTime - startTime)
 
             emit(
                 Resource.Success(
                     data =data,
+                    time = durationInSeconds.toString()
                 )
             )
 

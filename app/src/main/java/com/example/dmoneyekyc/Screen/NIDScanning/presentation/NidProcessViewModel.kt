@@ -63,10 +63,10 @@ class NidProcessViewModel @Inject constructor(
         viewModelScope.launch {
             val requestBody = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("file", "output_image.jpg", requestBody)  // Use the file's name
-                .addFormDataPart("pageMode", "11")
-                .addFormDataPart("ocrEngineMode", "1")
-                .addFormDataPart("lang", "eng")
+                .addFormDataPart("image", "output_image.jpg", requestBody)  // Use the file's name
+//                .addFormDataPart("pageMode", "11")
+//                .addFormDataPart("ocrEngineMode", "1")
+//                .addFormDataPart("lang", "eng")
                 .build()
             getNidOcrUseCase.invoke(requestBody).onEach {  resource ->
                 when(resource){
@@ -82,11 +82,12 @@ class NidProcessViewModel @Inject constructor(
                             response = resource.data!!
                         )
                         responseTime.value = resource.time!!
+                        localStorage.putString("ocrResponse",responseTime.toString())
 
                         Log.d("_ocrResponseState", "getOcrInfo: " + Gson().toJson(ocrResponseState.value.response))
 
-                        val formattedDate = changeDateFormat(ocrResponseState.value.response.data.nidDob.toString(), "dd MMM yyyy", "dd/MM/yyyy")
-                        localStorage.putString("nid",ocrResponseState.value.response.data.nidNumber.toString()?:"")
+                        val formattedDate = changeDateFormat(ocrResponseState.value.response.data[0].nidDob.toString(), "dd MMM yyyy", "dd/MM/yyyy")
+                        localStorage.putString("nid",ocrResponseState.value.response.data[0].nidNumber.toString()?:"")
                         localStorage.putString("dob",formattedDate?:"")
 //                        postNidInfo(location,resource.data)
 //                        postNidToEc(ocrResponseState.value.response.data.nidNumber.toString(),ocrResponseState.value.response.data.nidDob.toString())
@@ -115,7 +116,11 @@ class NidProcessViewModel @Inject constructor(
                     is Resource.Loading -> {}
                     is Resource.Success -> {
                         when(resource.data?.status == "OK"){
-                            true ->  _eventFlow.emit(NidScanUiEvent.NidBackPostEventSuccess(nid,dob))
+                            true -> {
+                                _eventFlow.emit(NidScanUiEvent.NidBackPostEventSuccess(nid, dob))
+                                responseTime.value = resource.time!!
+                                localStorage.putString("postToEc",responseTime.toString())
+                            }
                             false ->{}
                         }
 

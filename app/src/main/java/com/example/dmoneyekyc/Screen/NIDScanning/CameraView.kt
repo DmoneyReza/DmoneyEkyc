@@ -81,6 +81,7 @@ import com.example.dmoneyekyc.R
 import com.example.dmoneyekyc.Screen.NIDScanning.presentation.NidProcessViewModel
 import com.example.dmoneyekyc.Screen.NIDScanning.presentation.NidScanUiEvent
 import com.example.dmoneyekyc.util.GifImage
+import com.example.dmoneyekyc.util.saveBitmapToStorage
 import com.example.imagetotextextractor.utlis.OCR.PerformOCR
 import kotlinx.coroutines.flow.collectLatest
 
@@ -183,7 +184,7 @@ fun CameraView(
                 }
 
                 imageCapture.value = ImageCapture.Builder()
-                    .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                    .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
                     .build()
 
                 val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
@@ -220,6 +221,7 @@ fun CameraView(
         capturedImage.let { images ->
             images.value?.let {
                 drawAndCropRectangleOnImageBitmap(images.value!!)?.let { image ->
+                    saveBitmapToStorage(context,image.asAndroidBitmap(),"nidFront")
 
                     Column(
                         modifier = Modifier

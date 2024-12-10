@@ -9,7 +9,7 @@ import retrofit2.http.Query
 
 interface LivelinessApiService {
 
-    @POST("api/faceExtraction/matchFace")
+    @POST("/api/v1/compare_images")
     suspend fun postLiveliness(@Body  body: MultipartBody): LivelinessResponseModel
 
 }

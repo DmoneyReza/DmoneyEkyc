@@ -3,11 +3,13 @@ package com.example.dmoney.feature.SelfieVerification
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.location.Location
 import android.media.Image
+import android.util.Base64
 import android.util.Log
 
 import android.view.ViewGroup
@@ -49,6 +51,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.ContentScale
@@ -76,7 +79,11 @@ import com.example.dmoney.auth.presentation.ServiceViewModel
 import com.example.dmoney.feature_ekyc.SelfieVerification.presentation.SelfieUiEvent
 import com.example.dmoney.navigation.route.AuthRoute
 import com.example.dmoneyekyc.R
+import com.example.dmoneyekyc.Screen.SelfieVerification.utli.correctBitmapOrientation
 import com.example.dmoneyekyc.Screen.SelfieVerification.utli.mediaImageToBitmap
+import com.example.dmoneyekyc.util.saveBitmapToStorage
+import com.example.imagetotextextractor.utlis.working.correctImageOrientation
+import com.example.imagetotextextractor.utlis.working.resizeBitmapToFitMaxSize
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
 import kotlinx.coroutines.delay
@@ -134,7 +141,13 @@ fun FaceScanningScreen(
         viewModel.eventFlow.collectLatest { value: SelfieUiEvent ->
             when(value){
                 SelfieUiEvent.eventLivelinessFailed -> {}
-                SelfieUiEvent.eventLivelinessSuccess ->{}
+                SelfieUiEvent.eventLivelinessSuccess ->{
+                    navController.navigate(AuthRoute.Final.route){
+                        popUpTo(AuthRoute.Home.route){
+                            inclusive = false
+                        }
+                    }
+                }
                 SelfieUiEvent.eventSelfieFailed ->{}
                 SelfieUiEvent.eventSelfieSuccess -> {
                     navController.navigate(AuthRoute.Final.route){
@@ -150,6 +163,7 @@ fun FaceScanningScreen(
 
 
 
+    @SuppressLint("SuspiciousIndentation")
     fun onTextUpdated(face: Face, image: Image) {
 
 
@@ -164,14 +178,25 @@ fun FaceScanningScreen(
             else -> "None"
         }
 
-        if (face.leftEyeOpenProbability!! > 0.6f && face.leftEyeOpenProbability!! > 0.6f &&  face.headEulerAngleY < 1.0f && face.headEulerAngleY> -1.0f ) {
+        if (face.leftEyeOpenProbability!! > 0.6f && face.leftEyeOpenProbability!! > 0.6f
+            &&  face.headEulerAngleY < 1.0f && face.headEulerAngleY> -1.0f
+            ) {
 
             Log.d("leftEyeOpenProbability", "FaceScanningScreen: " + "Eye Open")
             if (selectedImage.value == null) {
 
                 selectedImage.value = image
                 var bitmap = mediaImageToBitmap(image)
+
                 var uri = saveBitmapToFile(context, bitmap!!)
+
+//                changing orientation
+             var rotatedBitmap =    correctBitmapOrientation(context,uri!!, bitmap)
+
+
+                saveBitmapToStorage(context,rotatedBitmap!!,"selfie")
+
+                sharedViewModel.selfiBitmap.value = rotatedBitmap
                 sharedViewModel.eyeOpenFaceImageUri.value = uri
 
 
@@ -214,7 +239,7 @@ fun FaceScanningScreen(
         if (direction.value == "done") {
             delay(2000) // 2 seconds delay
 //            var bitmap = mediaImageToBitmap(selectedImage.value!!)
-            val inputStream = context.contentResolver.openInputStream(sharedViewModel.eyeOpenFaceImageUri.value!!)
+            val inputStream = context.contentResolver.openInputStream(saveBitmapToFile(context,   resizeBitmapToFitMaxSize(sharedViewModel.selfiBitmap.value!!))!!)
             val fileRequestBody = inputStream?.readBytes()?.toRequestBody("image/jpeg".toMediaTypeOrNull())
             viewModel.getEcData(null,fileRequestBody!! ,context)
 

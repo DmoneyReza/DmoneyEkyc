@@ -9,10 +9,6 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface NidOCRApiService {
-    @POST("api/textExtraction/uploadNID")
+    @POST("api/v1/extract_text")
     suspend fun getNidInfo(@Body body: MultipartBody): OCRespondsModel
-
-
-
-
 }

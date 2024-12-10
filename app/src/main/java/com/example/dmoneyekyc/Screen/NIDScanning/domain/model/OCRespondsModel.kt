@@ -3,7 +3,7 @@ package com.example.dmoneyekyc.Screen.NIDScanning.domain.model
 data class OCRespondsModel (
    val  successMessage:String?,
    val  errorMessage:String?,
-    val data:OCRData
+    val data:List<OCRData>
 )
 
 data class OCRData(

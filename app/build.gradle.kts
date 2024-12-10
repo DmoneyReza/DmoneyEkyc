@@ -50,7 +50,7 @@ android {
 //            buildConfigField 'String', 'BASE_URL', '"https://test.dmoney.com.bd:3035/DmoneyPlatform/"'
 
             buildConfigField("String","BASE_URL",
-                "\"http://dsandbox.dmoney.com.bd:4040/\""
+                "\"https:sandbox.dmoney.com.bd:2002/\""
             )
 
             buildConfigField("String","EC_BASE_URL",

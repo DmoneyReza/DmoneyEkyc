@@ -58,8 +58,13 @@ class OcrRepositoryImp @Inject constructor(
 
 
         try {
+            val startTime = System.nanoTime()
             val data = ecPostApiService.postDataToEc(requestBody)
-            emit(Resource.Success(data))
+            val endTime = System.nanoTime()
+
+            // Calculate the duration in seconds
+            val durationInSeconds = TimeUnit.NANOSECONDS.toSeconds(endTime - startTime)
+            emit(Resource.Success(data, time = durationInSeconds.toString()))
 
         }catch (ex:HttpException){
 
