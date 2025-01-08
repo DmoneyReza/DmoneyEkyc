@@ -62,6 +62,7 @@ fun CaptureNIDScreen(
                     resizeBitmapToFitMaxSize(imageBitmap.asAndroidBitmap()) )!!)
                 val fileRequestBody = inputStream?.readBytes()?.toRequestBody("image/jpeg".toMediaTypeOrNull())
 //                sharedViewModel.uploadNidFront(fileRequestBody!!)
+                nidProcessViewModel.getOcrInfo(null,fileRequestBody!!)
                 nidProcessViewModel.deviceIdManager.getLastKnownLocation { location ->
                     nidProcessViewModel.getOcrInfo(location,fileRequestBody!!)
                 }

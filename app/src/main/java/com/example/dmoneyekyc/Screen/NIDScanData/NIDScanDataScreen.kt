@@ -88,8 +88,10 @@ fun NIDScanDataScreen(
     val datePickerDialog = DatePickerDialog(
         context, R.style.CustomDatePickerDialog,
         { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
+            val formattedDay = String.format("%02d", dayOfMonth)
+            val formattedMonth = String.format("%02d", month + 1)
 //            selectedDate = "$dayOfMonth/${month + 1}/$year"
-            nidScanDataViewModel.eventListener(NidScanInputEvent.EnteredDate("$dayOfMonth/${month + 1}/$year"))
+            nidScanDataViewModel.eventListener(NidScanInputEvent.EnteredDate("$formattedDay/${formattedMonth}/$year"))
         }, year, month, day)
 
     LaunchedEffect(key1 = true) {
@@ -99,10 +101,11 @@ fun NIDScanDataScreen(
                     isErrorDialogShow = true
                 }
                 NidScanDataUiEvent.EventSuccess ->{
-                    navController.navigate(AuthRoute.SelfieVerification.route){
-                        popUpTo(AuthRoute.SignUp.route){
+                    navController.navigate(AuthRoute.FaceAnalyzer.route){
+                        popUpTo(AuthRoute.NIDScanning.route){
                             inclusive = false
                         }
+
                     }
                 }
             }
@@ -167,7 +170,7 @@ fun NIDScanDataScreen(
             OutlinedTextField(
                 value = setNid.value.nid,
                 onValueChange = {
-                    if(it.length <10){
+                    if(it.length <15){
                       nidScanDataViewModel.eventListener(NidScanInputEvent.EnteredNid(it))
                     }
                 },
@@ -284,9 +287,9 @@ fun NIDScanDataScreen(
             DButton(
                 IsEnable = true,
                 onClick = {
-                    nidScanDataViewModel.deviceIdManager.getLastKnownLocation { location: Location? ->
-                        nidScanDataViewModel.eventListener(NidScanInputEvent.SubmitEvent(location))
-                    }
+
+                        nidScanDataViewModel.eventListener(NidScanInputEvent.SubmitEvent(null))
+
                 },
                 text = "Next"
             )

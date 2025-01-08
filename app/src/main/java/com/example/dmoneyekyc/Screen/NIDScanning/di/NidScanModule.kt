@@ -64,7 +64,7 @@ class NidScanModule {
 
     @Provides
     @Singleton
-    fun providerValidationNidScanDataUseCase():ValidationNidScanDataUseCase{
+    fun providerValidationNidScanDataUseCase2():ValidationNidScanDataUseCase{
         return ValidationNidScanDataUseCase()
     }
 

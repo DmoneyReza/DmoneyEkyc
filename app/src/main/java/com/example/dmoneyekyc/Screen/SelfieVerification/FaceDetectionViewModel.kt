@@ -57,10 +57,10 @@ class FaceDetectionViewModel @Inject constructor(
     fun getEcData(location: Location?, body: RequestBody, context: Context){
             viewModelScope.launch {
                 getEcDataUseCase.invoke(
-                    "3282735244",
-                    "15/11/1994"
-//                    localStorage.getString("nid").toString(),
-//                    localStorage.getString("dob").toString()
+//                    "3282735244",
+//                    "15/11/1994"
+                    localStorage.getString("nid").toString(),
+                    localStorage.getString("dob").toString()
 
                 ).onEach {resource ->
                     when(resource){

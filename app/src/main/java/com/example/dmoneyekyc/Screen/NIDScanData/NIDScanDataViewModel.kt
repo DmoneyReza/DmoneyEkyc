@@ -1,5 +1,6 @@
 package com.example.dmoneyekyc.Screen.NIDScanData
 import android.location.Location
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -21,6 +22,8 @@ import com.example.dmoney.navigation.route.GraphRoute
 import com.example.dmoney.util.ConnectivityObserver
 import com.example.dmoney.util.LocalStorageService
 import com.example.dmoneyekyc.Screen.NIDScanning.domain.usecase.PostToEcUseCase
+import com.example.dmoneyekyc.Screen.NIDScanning.presentation.NidScanUiEvent
+import com.example.dmoneyekyc.util.Resource
 import com.example.dmoneyekyc.util.ValidationResult
 
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,6 +32,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import okhttp3.MultipartBody
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,8 +41,9 @@ class NIDScanDataViewModel @Inject constructor(
     localStorage: LocalStorageService,
 //    private val connectivityObserver: ConnectivityObserver,
 //    val deviceIdManager: DeviceIdManager,
-    val validationNidScanDataUseCase: ValidationNidScanDataUseCase,
-    val postToEcUseCase: PostToEcUseCase
+
+    val postToEcUseCase: PostToEcUseCase,
+    val validationNidScanDataUseCase: ValidationNidScanDataUseCase
 
 
 ): ViewModel()  {
@@ -62,6 +67,8 @@ class NIDScanDataViewModel @Inject constructor(
 
     val nid = mutableStateOf("")
     val dob = mutableStateOf("")
+    val responseTime = mutableStateOf("0")
+
 
     init {
         localStorage.putString(GraphRoute.AuthGraph,AuthRoute.EkycSuccessScreen.route)
@@ -147,6 +154,44 @@ class NIDScanDataViewModel @Inject constructor(
 //
 //    }
 
+    fun postNidToEc(
+        nid:String,dob:String
+    ){
+        Log.d("postNidToEc", "postNidToEc: " +nid +""+dob)
+        viewModelScope.launch {
+            val requestBody = MultipartBody.Builder()
+                .setType(MultipartBody.FORM) // Use the file's name
+                .addFormDataPart("NID", nid)
+                .addFormDataPart("DOB", dob)
+                .build()
+
+            postToEcUseCase.invoke(requestBody).onEach { resource ->
+                when(resource){
+                    is Resource.Error -> {}
+                    is Resource.Loading -> {}
+                    is Resource.Success -> {
+                        when(resource.data?.status == "OK"){
+                            true -> {
+                                localStorage.putString("nid", nid)
+                                localStorage.putString("dob", dob)
+
+                                _eventFlow.emit(NidScanDataUiEvent.EventSuccess)
+                                responseTime.value = resource.time!!
+                                localStorage.putString("postToEc",responseTime.toString())
+                            }
+                            false ->{}
+                        }
+
+                    }
+                }
+
+
+            }.launchIn(this)
+        }
+
+
+    }
+
     fun eventListener(event: NidScanInputEvent){
         when(event){
             is NidScanInputEvent.EnteredDate -> {
@@ -161,7 +206,7 @@ class NIDScanDataViewModel @Inject constructor(
                 )
             }
             is NidScanInputEvent.SubmitEvent ->{
-
+                Log.d("SubmitEvent", "eventListener: " + nidState.value.nid +dobState.value.dob )
                 val nidResult = validationNidScanDataUseCase.executeNid(nidState.value.nid)
                 val dobResult = validationNidScanDataUseCase.executeDate(dobState.value.dob)
                 when(nidResult){
@@ -184,7 +229,7 @@ class NIDScanDataViewModel @Inject constructor(
                                 _dobState.value = dobState.value.copy(
                                     dobError = ""
                                 )
-//                                postNidData(event.value)
+                                postNidToEc(nidState.value.nid, dobState.value.dob)
                             }
 
                         }

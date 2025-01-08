@@ -86,8 +86,11 @@ class NidProcessViewModel @Inject constructor(
 
                         Log.d("_ocrResponseState", "getOcrInfo: " + Gson().toJson(ocrResponseState.value.response))
 
-                        val formattedDate = changeDateFormat(ocrResponseState.value.response.data[0].nidDob.toString(), "dd MMM yyyy", "dd/MM/yyyy")
-                        localStorage.putString("nid",ocrResponseState.value.response.data[0].nidNumber.toString()?:"")
+                        val formattedDate = changeDateFormat(ocrResponseState.value.response.data[1].nidDob.toString(), "dd MMM yyyy", "dd/MM/yyyy")
+                        if (ocrResponseState.value.response.data.isNotEmpty()) {
+                            val nidNumber = ocrResponseState.value.response.data[1].nidNumber?.toString() ?: ""
+                            localStorage.putString("nid", nidNumber)
+                        }
                         localStorage.putString("dob",formattedDate?:"")
 //                        postNidInfo(location,resource.data)
 //                        postNidToEc(ocrResponseState.value.response.data.nidNumber.toString(),ocrResponseState.value.response.data.nidDob.toString())

@@ -221,7 +221,7 @@ fun CameraView(
         capturedImage.let { images ->
             images.value?.let {
                 drawAndCropRectangleOnImageBitmap(images.value!!)?.let { image ->
-                    saveBitmapToStorage(context,image.asAndroidBitmap(),"nidFront")
+//                    saveBitmapToStorage(context,image.asAndroidBitmap(),"${ System.currentTimeMillis()}nidFront")
 
                     Column(
                         modifier = Modifier

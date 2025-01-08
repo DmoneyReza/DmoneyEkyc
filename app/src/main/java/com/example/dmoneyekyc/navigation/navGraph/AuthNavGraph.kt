@@ -24,7 +24,7 @@ fun NavGraphBuilder.AuthNavGraph(
 ) {
 
     navigation(
-        startDestination = AuthRoute.NIDScanning.route,
+        startDestination = AuthRoute.Home.route,
         route = GraphRoute.AuthGraph
     ) {
         composable(
