@@ -194,7 +194,7 @@ fun FaceScanningScreen(
              var rotatedBitmap =    correctBitmapOrientation(context,uri!!, bitmap)
 
 
-                saveBitmapToStorage(context,rotatedBitmap!!,"selfie")
+//                saveBitmapToStorage(context,rotatedBitmap!!,"selfie")
 
                 sharedViewModel.selfiBitmap.value = rotatedBitmap
                 sharedViewModel.eyeOpenFaceImageUri.value = uri

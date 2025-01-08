@@ -221,7 +221,7 @@ fun CameraView(
         capturedImage.let { images ->
             images.value?.let {
                 drawAndCropRectangleOnImageBitmap(images.value!!)?.let { image ->
-                    saveBitmapToStorage(context,image.asAndroidBitmap(),"nidFront")
+//                    saveBitmapToStorage(context,image.asAndroidBitmap(),"${ System.currentTimeMillis()}nidFront")
 
                     Column(
                         modifier = Modifier
@@ -357,8 +357,13 @@ fun CameraView(
 //                            viewModel.uploadNidFront(imageUri.value.toString())
                         }else if(label.value.contains("Back")){
                             viewModel.NIDBack.value = capturedImage.value
-                            nidProcessViewModel.postNidToEc(nidProcessViewModel.localStorage.getString("nid").toString(),nidProcessViewModel.localStorage.getString("dob").toString())
+//                            nidProcessViewModel.postNidToEc(nidProcessViewModel.localStorage.getString("nid").toString(),nidProcessViewModel.localStorage.getString("dob").toString())
 
+                            navController.navigate(AuthRoute.NIDScanData.route+"?nid=${nidProcessViewModel.localStorage.getString("nid").toString()?:""}"+"?dob=${nidProcessViewModel.localStorage.getString("dob").toString()?:""}") {
+                                popUpTo(AuthRoute.Home.route) {
+                                    inclusive = false
+                                }
+                            }
 //                            navController.navigate(AuthRoute.Final.route){
 //                                popUpTo(AuthRoute.Home.route){
 //                                    inclusive = false

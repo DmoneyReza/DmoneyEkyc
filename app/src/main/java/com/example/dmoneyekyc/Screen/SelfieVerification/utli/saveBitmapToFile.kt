@@ -13,7 +13,7 @@ import java.util.Date
 fun saveBitmapToFile(context: Context, bitmap: Bitmap): Uri? {
     try {
         // Create a file in the cache directory for the image
-        val file = File(context.cacheDir, "output_image.jpg")
+        val file = File(context.cacheDir, "${ System.currentTimeMillis()}output_image.jpg")
         FileOutputStream(file).use { out ->
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out) // Compress bitmap as JPEG
         }
