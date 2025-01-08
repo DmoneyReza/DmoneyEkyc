@@ -1,6 +1,7 @@
 package com.example.dmoneyekyc.Screen.NIDScanning.di
 
 
+import com.example.dmoneyekyc.Screen.NIDScanData.ValidationNidScanDataUseCase
 import com.example.dmoneyekyc.Screen.NIDScanning.data.EcPostApiService
 import com.example.dmoneyekyc.Screen.NIDScanning.data.NidOCRApiService
 import com.example.dmoneyekyc.Screen.NIDScanning.data.OcrRepositoryImp
@@ -61,5 +62,10 @@ class NidScanModule {
         return PostToEcUseCase(ocrRepository)
     }
 
+    @Provides
+    @Singleton
+    fun providerValidationNidScanDataUseCase():ValidationNidScanDataUseCase{
+        return ValidationNidScanDataUseCase()
+    }
 
 }

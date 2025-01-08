@@ -8,12 +8,14 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import androidx.navigation.navArgument
 import com.example.dmoney.auth.presentation.ServiceViewModel
 import com.example.dmoney.feature.SelfieVerification.FaceScanningScreen
 import com.example.dmoney.navigation.route.AuthRoute
 import com.example.dmoney.navigation.route.GraphRoute
 import com.example.dmoneyekyc.Screen.Final
 import com.example.dmoneyekyc.Screen.Home
+import com.example.dmoneyekyc.Screen.NIDScanData.NIDScanDataScreen
 import com.example.imagetotextextractor.utlis.working.CaptureNIDScreen
 
 
@@ -22,7 +24,7 @@ fun NavGraphBuilder.AuthNavGraph(
 ) {
 
     navigation(
-        startDestination = AuthRoute.FaceAnalyzer.route,
+        startDestination = AuthRoute.NIDScanning.route,
         route = GraphRoute.AuthGraph
     ) {
         composable(
@@ -60,6 +62,38 @@ fun NavGraphBuilder.AuthNavGraph(
         ) {
 
             CaptureNIDScreen(navController = navController)
+        }
+
+        composable(
+            route = AuthRoute.NIDScanData.route +"?nid={nid}"+"?dob={dob}",
+            arguments = listOf(
+                navArgument(
+                    name = "nid"
+                ){
+                    type  =NavType.StringType
+                    defaultValue = ""
+                },
+                navArgument(
+                    name = "dob"
+                ){
+                    type  =NavType.StringType
+                    defaultValue = ""
+                }
+            ),
+            enterTransition = { ->
+                slideInHorizontally(initialOffsetX = { 1000 }, animationSpec = tween(300))
+            },
+            exitTransition = { ->
+                slideOutHorizontally(targetOffsetX = { -1000 }, animationSpec = tween(300))
+            },
+            popExitTransition = { ->
+                slideOutHorizontally(targetOffsetX = { 1000 }, animationSpec = tween(300))
+            },
+            popEnterTransition = { ->
+                slideInHorizontally(initialOffsetX = { -1000 }, animationSpec = tween(300))
+            },
+        ) {
+            NIDScanDataScreen(navController = navController)
         }
 
 
